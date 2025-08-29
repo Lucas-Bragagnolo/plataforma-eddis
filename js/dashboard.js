@@ -463,6 +463,10 @@ function mostrarDetallesCurso(curso) {
   const examFeeAmount = document.getElementById('examFeeAmount');
   const examFeeDue = document.getElementById('examFeeDue');
   const payExamFeeButton = document.getElementById('payExamFeeButton');
+  const completedLessons = document.getElementById('completedLessons');
+  const totalLessons = document.getElementById('totalLessons');
+  const studyHours = document.getElementById('studyHours');
+  const averageScore = document.getElementById('averageScore');
 
 
 
@@ -470,9 +474,27 @@ function mostrarDetallesCurso(curso) {
   if (courseDetails) courseDetails.classList.remove('hidden');
 
   // Actualizar detalles del curso
-  courseName.textContent = curso.textoplan;
-  courseStatus.textContent = curso.estado;
-  courseDates.textContent = curso.fecha;
+  if (courseName) courseName.textContent = curso.textoplan || 'Curso sin nombre';
+  
+  // Determinar estado del curso basado en fechabaja y motivobaja
+  let estadoCurso = 'Activo';
+  let estadoClass = 'bg-green-100 text-green-800';
+  
+  if (curso.fechabaja && curso.motivobajades) {
+    estadoCurso = `Suspendido - ${curso.motivobajades}`;
+    estadoClass = 'bg-red-100 text-red-800';
+  }
+  
+  if (courseStatus) {
+    courseStatus.textContent = estadoCurso;
+    courseStatus.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${estadoClass}`;
+  }
+  
+  if (courseDates) {
+    const fechaInicio = curso.fecha || 'No especificada';
+    const fechaBaja = curso.fechabaja ? ` - Baja: ${curso.fechabaja}` : '';
+    courseDates.textContent = `Inicio: ${fechaInicio}${fechaBaja}`;
+  }
   // Update circular progress
   const progressCircle = document.getElementById('progressCircle');
   const progressPercentage = document.getElementById('progressPercentage');
@@ -488,33 +510,74 @@ function mostrarDetallesCurso(curso) {
   }
   
   if (progressText) {
-    progressText.textContent = `${curso.avance}% completado`;
+    progressText.textContent = `${curso.avance || 0}% completado`;
+  }
+  
+  // Actualizar estadísticas del progreso con datos reales de la API
+  if (completedLessons) {
+    completedLessons.textContent = curso.claseshechas || 0;
+  }
+  if (totalLessons) {
+    totalLessons.textContent = curso.clasestotales || 0;
+  }
+  if (studyHours) {
+    studyHours.textContent = curso.tiempouso || '0:00';
+  }
+  if (averageScore) {
+    // Calcular promedio basado en el avance o usar un valor por defecto
+    const promedio = curso.avance ? Math.round(curso.avance * 0.8 + 20) : 0; // Fórmula simple
+    averageScore.textContent = promedio;
   }
   
   // Calculate estimated time (example calculation)
   if (estimatedTime) {
     const remaining = 100 - (parseInt(curso.avance) || 0);
-    const estimatedHours = Math.ceil(remaining * 0.5); // Estimate 0.5 hours per percentage point
-    estimatedTime.textContent = remaining > 0 ? `${estimatedHours}h restantes` : 'Completado';
+    const clasesRestantes = (curso.clasestotales || 0) - (curso.claseshechas || 0);
+    if (clasesRestantes > 0) {
+      estimatedTime.textContent = `${clasesRestantes} clases restantes`;
+    } else {
+      estimatedTime.textContent = 'Completado';
+    }
   }
 
   // Actualizar estado de cuota regular
   if (curso.cuotas && Array.isArray(curso.cuotas)) {
-    // Buscar la cuota regular más próxima
-    const regularCuota = curso.cuotas.find(c => c.cuota !== '99');
-    if (regularCuota) {
-      // Buscar la última cuota NO PAGADA (excluyendo cuota 99)
-      const cuotasFiltradas = curso.cuotas.filter(c => c.cuota !== '99');
-      const ultimaNoPagada = [...cuotasFiltradas].reverse().find(c => c.pagado != 1 && c.pagado != 2);
-      let cuotaMostrar = ultimaNoPagada || cuotasFiltradas[cuotasFiltradas.length - 1];
-      const pagada = cuotaMostrar.pagado == 1 || cuotaMostrar.pagado == 2;
-      paymentStatus.textContent = pagada ? 'Pagada' : 'Pendiente';
-      paymentStatus.className = pagada 
-        ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
-        : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
-      paymentAmount.textContent = cuotaMostrar.importe;
-      paymentDue.textContent = cuotaMostrar.mes;
-      payButton.classList.add('hidden'); // Ocultar el botón de pagar para todas las cuotas
+    // Buscar la cuota regular más próxima (excluyendo cuota 99 que es derecho de examen)
+    const cuotasRegulares = curso.cuotas.filter(c => c.cuota !== '99');
+    const proximaCuotaPendiente = cuotasRegulares.find(c => c.pagado == '0');
+    const cuotaMostrar = proximaCuotaPendiente || cuotasRegulares[cuotasRegulares.length - 1];
+    
+    if (cuotaMostrar && paymentStatus && paymentAmount && paymentDue) {
+      const pagada = cuotaMostrar.pagado == '1' || cuotaMostrar.pagado == '2';
+      
+      // Determinar estado y color
+      let estadoTexto = 'Pendiente';
+      let estadoClass = 'bg-yellow-100 text-yellow-800';
+      
+      if (pagada) {
+        estadoTexto = cuotaMostrar.pagado == '2' ? 'Pronto Pago' : 'Pagada';
+        estadoClass = 'bg-green-100 text-green-800';
+      } else {
+        // Verificar si está vencida
+        const fechaVencimiento = new Date(cuotaMostrar.fechaven);
+        const hoy = new Date();
+        if (fechaVencimiento < hoy) {
+          estadoTexto = 'Vencida';
+          estadoClass = 'bg-red-100 text-red-800';
+        }
+      }
+      
+      paymentStatus.textContent = estadoTexto;
+      paymentStatus.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+      
+      // Formatear importe
+      const importe = parseFloat(cuotaMostrar.importe);
+      paymentAmount.textContent = `$${importe.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+      
+      paymentDue.textContent = `${cuotaMostrar.mes} - Vence: ${cuotaMostrar.fechaven}`;
+      
+      // Ocultar botón de pago (se puede implementar más adelante)
+      if (payButton) payButton.classList.add('hidden');
       // Botón para ver cuenta corriente
       let verCuentaBtn = document.getElementById('verCuentaCorrienteBtn');
       if (!verCuentaBtn) {
@@ -563,6 +626,35 @@ function mostrarDetallesCurso(curso) {
           mostrarHistorialCuotasEnPantalla(cuotasFiltradas, curso.textoplan);
         }
       };
+    }
+    
+    // Manejar derecho de examen (cuota 99)
+    const cuotaExamen = curso.cuotas.find(c => c.cuota === '99');
+    if (cuotaExamen && examFeeCard) {
+      examFeeCard.classList.remove('hidden');
+      
+      const examenPagado = cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2';
+      
+      if (examFeeStatus) {
+        examFeeStatus.textContent = examenPagado ? 'Pagado' : 'Pendiente';
+        examFeeStatus.className = examenPagado 
+          ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800'
+          : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+      }
+      
+      if (examFeeAmount) {
+        const importeExamen = parseFloat(cuotaExamen.importe);
+        examFeeAmount.textContent = `$${importeExamen.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+      }
+      
+      if (examFeeDue) {
+        examFeeDue.textContent = `${cuotaExamen.mes} - Vence: ${cuotaExamen.fechaven}`;
+      }
+      
+      // Ocultar botón de pago del examen por ahora
+      if (payExamFeeButton) payExamFeeButton.classList.add('hidden');
+    } else if (examFeeCard) {
+      examFeeCard.classList.add('hidden');
     }
   }
 
