@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Debug | Plataforma Educativa</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Stolzl:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        * {
+            font-family: 'Stolzl', system-ui, sans-serif;
+        }
+        
+        .debug-entry {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-100">
+    <div class="container mx-auto p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Login Form Column -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Login Debug</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Debug Activo</span>
+                    </div>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-4">
+                    
+                    <!-- Country Selector -->
+                    <div class="space-y-2">
+                        <label for="countrySelect" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-globe text-blue-500 mr-2"></i>
+                            Región
+                        </label>
+                        <select 
+                            id="countrySelect" 
+                            name="country" 
+                            required
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        >
+                            <option value="" disabled selected>Selecciona región...</option>
+                            <option value="ar">🇦🇷 Argentina</option>
+                            <option value="uy">🇺🇾 Uruguay</option>
+                            <option value="py">🇵🇾 Paraguay</option>
+                            <option value="sb">💄 Studio Beauty</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Username Field -->
+                    <div class="space-y-2">
+                        <label for="username" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-user text-blue-500 mr-2"></i>
+                            Legajo
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            placeholder="Ej: 1465192"
+                        >
+                    </div>
+                    
+                    <!-- Document Field -->
+                    <div class="space-y-2">
+                        <label for="documento" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-id-card text-blue-500 mr-2"></i>
+                            Documento
+                        </label>
+                        <input 
+                            type="text" 
+                            id="documento" 
+                            name="documento" 
+                            required
+                            class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            placeholder="Ej: 16639850"
+                        >
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit"
+                        id="submitBtn"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                    >
+                        <span id="submitText" class="flex items-center justify-center">
+                            <i class="fas fa-sign-in-alt mr-2"></i>
+                            Iniciar Sesión (Debug)
+                        </span>
+                        <span id="submitLoading" class="hidden flex items-center justify-center">
+                            <div class="spinner mr-2"></div>
+                            Procesando...
+                        </span>
+                    </button>
+                    
+                </form>
+                
+                <!-- Quick Test Buttons -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Tests Rápidos:</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="testValidBtn" class="px-3 py-2 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">
+                            Test Válido
+                        </button>
+                        <button id="testInvalidBtn" class="px-3 py-2 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">
+                            Test Inválido
+                        </button>
+                        <button id="clearDebugBtn" class="px-3 py-2 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200">
+                            Limpiar Debug
+                        </button>
+                        <button id="exportDebugBtn" class="px-3 py-2 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200">
+                            Exportar Log
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Debug Console Column -->
+            <div class="bg-gray-900 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold">Debug Console</h2>
+                    <div class="flex items-center space-x-2">
+                        <button id="toggleAutoScroll" class="px-2 py-1 bg-gray-700 rounded text-xs">
+                            Auto-scroll: ON
+                        </button>
+                        <button id="clearConsole" class="px-2 py-1 bg-red-600 rounded text-xs">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="debugContainer" class="space-y-2 max-h-96 overflow-y-auto bg-gray-800 rounded-lg p-4">
+                    <div class="text-green-400 text-sm">
+                        <i class="fas fa-play mr-2"></i>
+                        Debug console iniciado - Esperando actividad...
+                    </div>
+                </div>
+                
+                <!-- Network Info -->
+                <div class="mt-4 pt-4 border-t border-gray-700">
+                    <h3 class="text-sm font-semibold mb-2">Información de Red:</h3>
+                    <div class="text-xs space-y-1">
+                        <div>URL Base: <span class="text-blue-400" id="apiBaseUrl">https://servidoreddis.com.ar/api</span></div>
+                        <div>Endpoint: <span class="text-green-400">/auth/login.php</span></div>
+                        <div>Método: <span class="text-yellow-400">GET</span></div>
+                        <div>Estado: <span class="text-green-400" id="connectionStatus">Listo</span></div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300 ease-out">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 max-w-sm">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i id="toastIcon" class="w-5 h-5"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                </div>
+                <button id="toastClose" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { handleLogin } from '../js/auth.js';
+        import { setupToastClose } from '../js/utils.js';
+
+        let autoScroll = true;
+        let debugLogs = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDebugLogin();
+            setupToastClose();
+            setupDebugControls();
+        });
+
+        function setupDebugLogin() {
+            const form = document.getElementById('loginForm');
+            
+            if (form) {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    // Log form submission
+                    logToDebugConsole('📝 FORMULARIO ENVIADO', {
+                        timestamp: new Date().toISOString(),
+                        formData: new FormData(form)
+                    }, 'info');
+                    
+                    await handleLogin(event);
+                });
+            }
+        }
+
+        function setupDebugControls() {
+            // Test buttons
+            document.getElementById('testValidBtn').addEventListener('click', () => {
+                fillFormWithValidData();
+            });
+
+            document.getElementById('testInvalidBtn').addEventListener('click', () => {
+                fillFormWithInvalidData();
+            });
+
+            document.getElementById('clearDebugBtn').addEventListener('click', () => {
+                clearDebugConsole();
+            });
+
+            document.getElementById('exportDebugBtn').addEventListener('click', () => {
+                exportDebugLog();
+            });
+
+            document.getElementById('clearConsole').addEventListener('click', () => {
+                clearDebugConsole();
+            });
+
+            document.getElementById('toggleAutoScroll').addEventListener('click', (e) => {
+                autoScroll = !autoScroll;
+                e.target.textContent = `Auto-scroll: ${autoScroll ? 'ON' : 'OFF'}`;
+            });
+        }
+
+        function fillFormWithValidData() {
+            document.getElementById('countrySelect').value = 'ar';
+            document.getElementById('username').value = '1465192';
+            document.getElementById('documento').value = '16639850';
+            
+            logToDebugConsole('✅ DATOS DE PRUEBA VÁLIDOS CARGADOS', {
+                pais: 'ar',
+                legajo: '1465192',
+                documento: '16639850'
+            }, 'success');
+        }
+
+        function fillFormWithInvalidData() {
+            document.getElementById('countrySelect').value = '';
+            document.getElementById('username').value = '123';
+            document.getElementById('documento').value = 'abc';
+            
+            logToDebugConsole('❌ DATOS DE PRUEBA INVÁLIDOS CARGADOS', {
+                pais: '',
+                legajo: '123',
+                documento: 'abc'
+            }, 'warning');
+        }
+
+        function logToDebugConsole(step, data, type = 'info') {
+            const debugContainer = document.getElementById('debugContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                step,
+                data,
+                type
+            };
+            
+            debugLogs.push(logEntry);
+            
+            const debugEntry = document.createElement('div');
+            debugEntry.className = `debug-entry text-sm mb-2 p-2 rounded`;
+            
+            const typeColors = {
+                info: 'bg-blue-900 text-blue-200 border-l-4 border-blue-400',
+                success: 'bg-green-900 text-green-200 border-l-4 border-green-400',
+                error: 'bg-red-900 text-red-200 border-l-4 border-red-400',
+                warning: 'bg-yellow-900 text-yellow-200 border-l-4 border-yellow-400'
+            };
+            
+            debugEntry.className += ` ${typeColors[type]}`;
+            
+            debugEntry.innerHTML = `
+                <div class="flex items-center justify-between mb-1">
+                    <span class="font-semibold">${step}</span>
+                    <span class="text-xs opacity-75">${timestamp}</span>
+                </div>
+                <pre class="text-xs bg-black bg-opacity-30 p-2 rounded overflow-auto max-h-32 whitespace-pre-wrap">${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}</pre>
+            `;
+            
+            debugContainer.appendChild(debugEntry);
+            
+            if (autoScroll) {
+                debugContainer.scrollTop = debugContainer.scrollHeight;
+            }
+        }
+
+        function clearDebugConsole() {
+            const debugContainer = document.getElementById('debugContainer');
+            debugContainer.innerHTML = `
+                <div class="text-green-400 text-sm">
+                    <i class="fas fa-broom mr-2"></i>
+                    Console limpiado - ${new Date().toLocaleTimeString()}
+                </div>
+            `;
+            debugLogs = [];
+        }
+
+        function exportDebugLog() {
+            const logData = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                logs: debugLogs
+            };
+            
+            const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `debug-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            logToDebugConsole('💾 LOG EXPORTADO', {
+                filename: a.download,
+                entries: debugLogs.length
+            }, 'success');
+        }
+
+        // Enhanced toast function
+        window.showToast = function(message, type = 'info', duration = 4000) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const iconConfig = {
+                success: { icon: 'fas fa-check-circle', class: 'text-green-500' },
+                error: { icon: 'fas fa-exclamation-circle', class: 'text-red-500' },
+                info: { icon: 'fas fa-info-circle', class: 'text-blue-500' },
+                warning: { icon: 'fas fa-exclamation-triangle', class: 'text-yellow-500' }
+            };
+            
+            const config = iconConfig[type] || iconConfig.info;
+            
+            toastIcon.className = `w-5 h-5 ${config.icon} ${config.class}`;
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('translate-x-full');
+            
+            // Also log to debug console
+            logToDebugConsole('🔔 TOAST MOSTRADO', {
+                message,
+                type,
+                duration
+            }, type);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, duration);
+        };
+
+        // Make logToDebugConsole available globally
+        window.logToDebugConsole = logToDebugConsole;
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+/* Variables de la paleta de colores */
+:root {
+  --primary: #32417f;
+  --primary-dark: rgb(35, 45, 89);
+  --primary-light: rgb(65, 80, 144);
+  --gray-custom: rgb(131, 125, 127);
+  /* Dark mode variables */
+  --bg-dark: #142042;           /* Azul principal accesible AAA */
+  --bg-dark-secondary: #32417f; /* Azul secundario más suave */
+  --primary-darkmode: #32417f;  /* Azul intermedio para elementos destacados */
+  --text-dark: #ffffff;         /* Blanco puro para contraste máximo */
+  --text-dark-secondary: #e0e6f1; /* Gris muy claro para textos secundarios */
+  --border-dark: #2d3959;       /* Azul grisáceo para bordes */
+  --card-dark: #142042; 
+          /* Igual que secondary para tarjetas */
+  --gray-dark: #a6b0c3;         /* Gris neutro para detalles sutiles */
+}
+
+
+body {
+  --sb-track-color: #ffffff;
+  --sb-thumb-color: #32417f;
+  --sb-size: 14px;
+}
+
+body::-webkit-scrollbar {
+  width: var(--sb-size)
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 3px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 3px;
+  
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  body {
+    scrollbar-color: var(--sb-thumb-color)
+                     var(--sb-track-color);
+  }
+}
+
+/* Modo oscuro: activar con <body class="dark"> */
+.dark {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-dark) !important;
+  transition: background 0.3s, color 0.3s;
+}
+.dark body {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-dark) !important;
+}
+.dark .bg-white,
+.dark .card,
+.dark .bg-menu,
+.dark .rounded-lg,
+.dark .shadow-sm,
+.dark .border-gray-200 {
+  background-color: var(--card-dark) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-dark) !important;
+}
+
+header {
+  background-color: white !important;
+}
+
+.dark header {
+  background-color: var(--bg-dark-secondary) !important;
+}
+.dark .border,
+.dark .border-gray-300 {
+  border-color: var(--border-dark) !important;
+}
+.dark .text-gray-900,
+.dark .text-gray-700 {
+  color: var(--text-dark) !important;
+}
+.dark .text-gray-500 {
+  color: var(--text-dark-secondary) !important;
+}
+.dark .menu-item {
+  background-color: var(--bg-dark-secondary) !important;
+  color: var(--text-dark) !important;
+}
+.dark .menu-item:hover {
+  background-color: var(--primary-darkmode) !important;
+  color: #fff !important;
+}
+.dark .active-tab {
+  background-color: var(--primary-darkmode) !important;
+  border: 1px solid white !important;
+  color: #fff !important;
+}
+.dark .sidebar-collapsed {
+  background: var(--bg-dark-secondary) !important;
+  color: var(--text-dark) !important;
+}
+.dark .sidebar-collapsed:hover {
+  background: var(--primary-darkmode) !important;
+  color: #fff !important;
+}
+.dark .course-selector,
+.dark select,
+.dark .form-input {
+  background: var(--bg-dark-secondary) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-dark) !important;
+}
+.dark .course-selector:focus,
+.dark select:focus,
+.dark .form-input:focus {
+  border-color: var(--primary-darkmode) !important;
+}
+.dark .pay-button {
+  background: var(--primary-darkmode) !important;
+  color: #fff !important;
+}
+.dark .pay-button:hover {
+  background: var(--primary) !important;
+}
+.dark .toast {
+  background: var(--bg-dark-secondary) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-dark) !important;
+}
+.dark .shadow-lg,
+.dark .shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+
+* {
+  font-family: 'Stolzl', system-ui, sans-serif;
+}
+/* Estilos base */
+body {
+  font-family: "stolzl", sans-serif;
+
+}
+
+/* Estilos del menú */
+.menu-item {
+  background-color: white;
+}
+
+.menu-item:hover {
+  background-color: #f3f4f6;
+  border-color: var(--primary);
+  transform: scale(1.02);
+}
+
+.menu-item i {
+  width: 1.25rem;
+  text-align: center;
+}
+
+.bg-menu{
+  background-color: white;
+}
+
+/* Estilo para el tab activo */
+.active-tab {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+.active-tab:hover {
+  background-color: var(--primary-dark) !important;
+  color: white !important;
+}
+
+/* Estilos para el formulario */
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+/* Estilos de las tarjetas */
+.card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilos para el toast */
+.toast {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.toast .fa-solid {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Estilos para el selector de curso */
+.course-selector {
+  border-color: #e5e7eb;
+}
+
+.course-selector:focus {
+  border-color: var(--primary);
+}
+
+/* Estilos para el botón de pago */
+.pay-button {
+  transition: all 0.2s ease;
+}
+
+.pay-button:hover {
+  transform: scale(1.02);
+}
+
+/* Estilos para el certificado */
+.certificate-icon {
+  width: 3rem;
+  height: 3rem;
+}

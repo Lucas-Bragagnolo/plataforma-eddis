@@ -1,0 +1,390 @@
+/* Studio Beauty Brand Theme - Manual de Marca */
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600&family=Domine:wght@700&display=swap');
+
+:root {
+  --primary: #101820;
+  --secondary: #D9D9D6;
+  --accent: #101820;
+  --background: #fff;
+  --text-main: #101820;
+  --text-secondary: #6b6b6b;
+  --border: #d9d9d6;
+
+  /* Dark mode variables */
+  --bg-dark: #101820;           /* Azul principal accesible AAA */
+  --bg-dark-secondary: #1a274f; /* Azul secundario más suave */
+  --primary-darkmode: #26407a;  /* Azul intermedio para elementos destacados */
+  --text-dark: #ffffff;         /* Blanco puro para contraste máximo */
+  --text-dark-secondary: #e0e6f1; /* Gris muy claro para textos secundarios */
+  --border-dark: #101820;       /* Azul grisáceo para bordes */
+  --card-dark: #101820;         /* Igual que secondary para tarjetas */
+  --gray-dark: #a6b0c3;         /* Gris neutro para detalles sutiles */
+}
+
+* {
+  font-family: 'Albert Sans', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Albert Sans', Arial, sans-serif;
+  background: var(--secondary);
+  color: var(--text-main);
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6, .heading, .title {
+  font-family: 'Domine', serif;
+  color: var(--primary);
+  font-weight: 700;
+  margin-top: 0;
+}
+
+.menu-item {
+  background: var(--background);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.menu-item:hover, .menu-item:focus {
+  background: var(--secondary);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  transform: none;
+}
+.menu-item i {
+  width: 1.25rem;
+  text-align: center;
+}
+
+.active-tab {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+  border: 1.5px solid var(--primary) !important;
+}
+.active-tab:hover {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+button, .btn {
+  /*background: var(--primary);*/
+  color: #fff;
+  /*border: 1.5px solid var(--primary);*/
+  border-radius: 0;
+  font-family: 'Albert Sans', Arial, sans-serif;
+  font-weight: 600;
+  padding: 0.7em 2em;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  cursor: pointer;
+}
+button:hover, .btn:hover, button:focus, .btn:focus {
+  background: var(--secondary);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+input, select, textarea {
+  background: #fff;
+  color: var(--primary);
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  font-family: 'Albert Sans', Arial, sans-serif;
+  padding: 0.6em 1em;
+  outline: none;
+  transition: border 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  border: 1.5px solid var(--primary);
+}
+
+.card, .panel, .box {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: var(--secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+/* Toast/alert styles */
+#toast {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0;
+  border: 1.5px solid var(--border);
+  font-family: 'Albert Sans', Arial, sans-serif;
+}
+
+/* Otros elementos personalizados según el manual de marca */
+.table, table {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  font-family: 'Albert Sans', Arial, sans-serif;
+}
+.table th, .table td, table th, table td {
+  border: 1.5px solid var(--border);
+  color: var(--primary);
+  padding: 0.7em 1.2em;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
+}
+a:hover, a:focus {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Remove border radius globally for all elements */
+*:not(svg):not(path) {
+  border-radius: 0 !important;
+}
+
+header {
+  background: var(--secondary);
+}
+
+.dark header {
+  background: var(--primary);
+}
+
+/* ===== DARK MODE ===== */
+body.dark {
+  background: var(--primary);
+  color: var(--secondary);
+}
+body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6, body.dark .heading, body.dark .title {
+  color: var(--secondary);
+}
+body.dark .menu-item {
+  background: #181e2a;
+  color: var(--secondary);
+  border: 1px solid #23272f;
+}
+body.dark .menu-item:hover, body.dark .menu-item:focus {
+  background: #23272f;
+  color: var(--secondary);
+  border: 1.5px solid var(--secondary);
+}
+body.dark .active-tab {
+  background: var(--secondary) !important;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--secondary) !important;
+}
+body.dark .active-tab:hover {
+  background: #bdbdbb !important;
+  color: var(--primary) !important;
+}
+body.dark button, body.dark .btn {
+  background: #23272f;
+  color: var(--secondary);
+  border: 1.5px solid #444950;
+  transition: all 0.2s ease;
+}
+body.dark button:hover, body.dark .btn:hover {
+  background: #181e2a;
+  color: var(--secondary);
+  border: 1.5px solid var(--secondary);
+}
+body.dark button:focus, body.dark .btn:focus {
+  background: #181e2a;
+  color: var(--secondary);
+  border: 1.5px solid var(--secondary);
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+body.dark button:active, body.dark .btn:active {
+  background: #10141b;
+  color: var(--secondary);
+  border: 1.5px solid var(--secondary);
+}
+body.dark input, body.dark select, body.dark textarea {
+  background: #23272f;
+  color: var(--secondary);
+  border: 1.5px solid #444950;
+}
+body.dark input:focus, body.dark select:focus, body.dark textarea:focus {
+  border: 1.5px solid var(--secondary);
+}
+body.dark .card,
+body.dark .panel,
+body.dark .box,
+body.dark .course-selector,
+body.dark .empty-state,
+body.dark .course-details,
+body.dark .payment-box,
+body.dark .certificates-section,
+body.dark .progress-container,
+body.dark .course-card,
+body.dark .course,
+body.dark .course-list,
+body.dark .curso,
+body.dark .curso-card,
+body.dark .curso-box,
+body.dark .curso-panel,
+body.dark .bg-white,
+body.dark .bg-light,
+body.dark .rounded-lg,
+body.dark .shadow-sm,
+body.dark .border-gray-200 {
+  background: #181e2a !important;
+  border: 1.5px solid #23272f !important;
+  color: var(--text-dark) !important;
+}
+
+body.dark,
+body.dark p,
+body.dark span,
+body.dark div,
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark h5,
+body.dark h6,
+body.dark strong,
+body.dark em,
+body.dark label,
+body.dark a,
+body.dark li,
+body.dark td,
+body.dark th,
+body.dark input,
+body.dark select,
+body.dark textarea,
+body.dark button,
+body.dark .card,
+body.dark .panel,
+body.dark .box,
+body.dark .course-card,
+body.dark .curso,
+body.dark .curso-card,
+body.dark .curso-box,
+body.dark .curso-panel {
+  color: var(--text-dark) !important;
+}
+
+
+body.dark .pay-button {
+  background: var(--secondary) !important;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--secondary) !important;
+}
+body.dark .pay-button:hover {
+  background: #23272f !important;
+  color: var(--secondary) !important;
+  border: 1.5px solid var(--secondary) !important;
+}
+body.dark .certificate-icon {
+  background: #23272f !important;
+  color: var(--secondary) !important;
+}
+body.dark .progress-bar {
+  background: var(--secondary) !important;
+}
+body.dark .progress-container {
+  background: #23272f !important;
+}
+body.dark .course-header, body.dark .course-title {
+  background: #181e2a !important;
+  color: var(--secondary) !important;
+}
+body.dark .course-description {
+  color: #bdbdbb !important;
+}
+
+body.dark #toast {
+  background: var(--secondary);
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+body.dark .table, body.dark table {
+  background: #181e2a;
+  border: 1.5px solid #23272f;
+  color: var(--secondary);
+}
+body.dark .table th, body.dark .table td, body.dark table th, body.dark table td {
+  border: 1.5px solid #23272f;
+  color: var(--secondary);
+}
+body.dark a {
+  color: var(--secondary);
+}
+body.dark a:hover, body.dark a:focus {
+  color: #bdbdbb;
+}
+body.dark ::-webkit-scrollbar {
+  background: #23272f;
+}
+body.dark ::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+}
+
+/* Estilos para el formulario */
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+/* Estilos de las tarjetas */
+.card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilos para el toast */
+.toast {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.toast .fa-solid {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Estilos para el selector de curso */
+.course-selector {
+  border-color: #e5e7eb;
+}
+
+.course-selector:focus {
+  border-color: var(--primary);
+}
+
+/* Estilos para el botón de pago */
+.pay-button {
+  transition: all 0.2s ease;
+}
+
+.pay-button:hover {
+  transform: scale(1.02);
+}
+
+/* Estilos para el certificado */
+.certificate-icon {
+  width: 3rem;
+  height: 3rem;
+}
+
+#toggleDarkMode {
+  border: none;
+  background: none;
+}

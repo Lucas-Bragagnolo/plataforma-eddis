@@ -1,0 +1,906 @@
+// Simple Dashboard Module
+
+//console.log('[DEBUG] Dashboard.js cargado');
+import { apiService, ApiError, COUNTRIES } from "./api.js"
+import { showToast, formatDate } from "./utils.js"
+import { checkAuthStatus, logout } from "./auth.js"
+
+// Mostrar estado vacío cuando no hay datos
+function mostrarEstadoVacio() {
+  //console.log('[DEBUG] Entrando a mostrarEstadoVacio');
+  const emptyState = document.getElementById('emptyState');
+  const courseDetails = document.getElementById('courseDetails');
+  
+  if (emptyState && courseDetails) {
+    emptyState.classList.remove('hidden');
+    courseDetails.classList.add('hidden');
+  }
+  //console.log('[DEBUG] mostrarEstadoVacio completado');
+}
+
+// Variables globales
+let userData = {}
+let coursesData = {}
+let paymentsData = []
+
+// Inicialización del dashboard
+document.addEventListener("DOMContentLoaded", async () => {
+  //console.log('[DEBUG] Evento DOMContentLoaded disparado');
+  
+  if (!checkAuthStatus()) {
+    //console.log('[DEBUG] Usuario NO autenticado');
+    return;
+  }
+  //console.log('[DEBUG] Usuario autenticado');
+
+  // Show current country info
+  displayCurrentCountryInfo();
+
+  // Initialize dashboard
+      //console.log('[DEBUG] Iniciando initializeDashboard');
+  await initializeDashboard();
+  //console.log('[DEBUG] initializeDashboard completado');
+  
+  setupEventListeners();
+  //console.log('[DEBUG] Event listeners configurados');
+})
+
+// Display current country information
+function displayCurrentCountryInfo() {
+  //console.log('[DEBUG] displayCurrentCountryInfo');
+  const currentCountry = apiService.getCurrentCountry()
+  //console.log('[DEBUG] Current country:', currentCountry);
+  const countryInfo = COUNTRIES[currentCountry]
+  //console.log('[DEBUG] Country info:', countryInfo);
+
+  if (countryInfo) {
+    // Add country indicator to header
+    addCountryIndicator(countryInfo)
+
+    // Show welcome message
+    showToast(`Conectado desde ${countryInfo.name}`, "info")
+  }
+}
+
+// Add country indicator to header
+function addCountryIndicator(countryInfo) {
+  const header = document.querySelector("header")
+  if (!header) return
+
+  // Remove existing indicator
+  const existingIndicator = header.querySelector(".country-indicator")
+  if (existingIndicator) {
+    existingIndicator.remove()
+  }
+
+  // Create new indicator
+  const indicator = document.createElement("div")
+  indicator.className =
+    "country-indicator flex items-center bg-blue-100 text-blue-800 px-3 py-2 rounded-full text-sm font-medium mr-4"
+  indicator.innerHTML = `
+    <span class="mr-2">${countryInfo.flag}</span>
+    
+  `
+
+  // Insert before dark mode toggle
+  const darkModeToggle = header.querySelector("#toggleDarkMode")
+  if (darkModeToggle) {
+    header.insertBefore(indicator, darkModeToggle)
+  } else {
+    header.appendChild(indicator)
+  }
+}
+
+// Initialize dashboard
+async function initializeDashboard() {
+  //console.log('[DEBUG] Entrando a initializeDashboard');
+  showTab("tab-cursos-actuales");
+  //console.log('[DEBUG] Tab mostrado');
+  
+  try {
+    //console.log('[DEBUG] Llamando a loadUserDataFromAPI');
+    await loadUserDataFromAPI();
+    //    console.log('[DEBUG] loadUserDataFromAPI completado');
+  } catch (error) {
+    //console.error('[ERROR] Error en initializeDashboard:', error);
+    throw error;
+  }
+}
+
+// Load user data from API
+async function loadUserDataFromAPI() {
+  //console.log('[DEBUG] Entrando a loadUserDataFromAPI');
+  const entidad = localStorage.getItem('lastLoginCountry');
+  const currentCountry = apiService.getCurrentCountry();
+  const countryInfo = COUNTRIES[currentCountry];
+  
+  try {
+    //console.log('[DEBUG] Mostrando toast de carga');
+    showToast(`Cargando datos desde ${entidad}...`, "info");
+
+    //console.log('[DEBUG] Llamando a getAlumnoData');
+    const response = await apiService.getAlumnoData();
+    //console.log('[DEBUG] Respuesta de getAlumnoData:', response);
+
+    if (response.success) {
+      // Update global data
+      userData = response;
+     // userData.fechaini = response.fechaini;
+      //console.log('[DEBUG] Actualizando datos de usuario:', userData);
+      //console.log('[DEBUG] Llamando a poblarSelectorCursos');
+      poblarSelectorCursos(response.cursos);
+      //console.log('[DEBUG] poblarSelectorCursos completado');
+
+      updateUserInterface();
+      //console.log('[DEBUG] UI actualizada');
+      
+      showToast(`Datos cargados correctamente`, "success");
+    } else {
+      //console.error('[ERROR] Respuesta sin success:', response);
+      throw new Error(response.message || "Error al cargar los datos");
+    }
+  } catch (error) {
+    console.error('[ERROR] Error en loadUserDataFromAPI:', error);
+    handleDataLoadError(error);
+  }
+}
+
+// Handle data loading errors
+function handleDataLoadError(error) {
+  if (error instanceof ApiError) {
+    if (error.isUnauthorized()) {
+      showToast("Sesión expirada. Redirigiendo al login...", "error")
+      apiService.logout()
+      setTimeout(() => {
+        window.location.href = "login.html"
+      }, 2000)
+    } else {
+      showToast(error.message, "error")
+    }
+  } else {
+    showToast("Error al cargar los datos. Inténtalo de nuevo.", "error")
+  }
+}
+
+// Update user interface
+function updateUserInterface() {
+  //console.log('[DEBUG] Entrando a updateUserInterface');
+  updateUserProfile(userData);
+  updateUserData();
+  updatePaymentsHistory();
+  //console.log('[DEBUG] updateUserInterface completado');
+}
+
+// Update user profile
+function updateUserData() {
+  //console.log('[DEBUG] Entrando a updateUserData');
+  const nombreUsuario = document.getElementById("nombreUsuario");
+  //console.log('[DEBUG] updateUserData userData:', userData);
+  if (nombreUsuario) {
+    if (userData) {
+      nombreUsuario.textContent = userData.nombre + " " + userData.apellido;
+        //console.log('[DEBUG] Renderizado en #nombreUsuario:', userData);
+    } else {
+      nombreUsuario.textContent = "";
+      //console.log('[DEBUG] userData incompleto, no se renderiza nombre');
+    }
+  } else {
+    //console.log('[DEBUG] No se encontró el elemento #nombreUsuario en el DOM');
+  }
+  //console.log('[DEBUG] updateUserData completado');
+}
+
+function updateUserProfile() {
+  //console.log('[DEBUG] Entrando a updateUserProfile');
+  const currentCountry = apiService.getCurrentCountry()
+  const countryInfo = COUNTRIES[currentCountry]
+
+  const elements = {
+    nombreUsuario: `${userData.nombre} ${userData.apellido}`,
+    userNombre: `${userData.nombre} ${userData.apellido}`,
+    userEmail: userData.email,
+    userLegajo: userData.legajo,
+    userDocumento: userData.documento,
+    miembroDesde: `Miembro desde: ${userData.fechaingreso}`,
+  }
+
+  Object.entries(elements).forEach(([id, value]) => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.textContent = value
+    }
+  })
+
+  // Add country info to user card
+  const userCard = document.getElementById("userCard")
+  const entidad = localStorage.getItem('lastLoginCountry');
+  if (userCard && countryInfo) {
+    // Remove existing country badge
+    const existingBadge = userCard.querySelector(".country-badge")
+    if (existingBadge) {
+      existingBadge.remove()
+    }
+
+    // Add country badge
+    const countryBadge = document.createElement("div")
+    countryBadge.className = "country-badge text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded mt-1"
+    countryBadge.innerHTML = `${entidad}`
+
+    const userInfo = userCard.querySelector("#userInfo")
+    if (userInfo) {
+      userInfo.appendChild(countryBadge)
+    }
+  }
+
+  // Fill form inputs
+  const formInputs = {
+    nombreInput: userData.nombre,
+    apellidoInput: userData.apellido,
+    emailInput: userData.email,
+    documentoInput: userData.documento,
+    telefonoInput: userData.telefono,
+    ubicacionInput: userData.ubicacion,
+  }
+
+  Object.entries(formInputs).forEach(([id, value]) => {
+    const input = document.getElementById(id)
+    if (input) {
+      input.value = value || ""
+    }
+  })
+  //console.log('[DEBUG] updateUserProfile completado');
+}
+
+// Update payments history
+function updatePaymentsHistory() {
+  //console.log('[DEBUG] Entrando a updatePaymentsHistory');
+  const container = document.getElementById("contenedor-pagos")
+  if (!container) return
+
+  container.innerHTML = ""
+
+  paymentsData.forEach((payment) => {
+    const paymentCard = createPaymentCard(payment)
+    container.appendChild(paymentCard)
+  })
+  //console.log('[DEBUG] updatePaymentsHistory completado');
+}
+
+// Create payment card
+function createPaymentCard(payment) {
+  //console.log('[DEBUG] Entrando a createPaymentCard');
+  const card = document.createElement("div")
+  card.className = "bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+
+  const statusClass = {
+    pagado: "bg-green-100 text-green-800",
+    pendiente: "bg-yellow-100 text-yellow-800",
+    vencido: "bg-red-100 text-red-800",
+  }
+
+  card.innerHTML = `
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">${payment.curso}</h3>
+        <p class="text-sm text-gray-500">${formatDate(payment.fecha)}</p>
+      </div>
+      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusClass[payment.estado]}">
+        ${payment.estado.charAt(0).toUpperCase() + payment.estado.slice(1)}
+      </span>
+    </div>
+    <div class="space-y-2">
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">Monto:</span>
+        <span class="text-sm font-medium text-gray-900">${payment.monto}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">Método:</span>
+        <span class="text-sm text-gray-900">${payment.metodo}</span>
+      </div>
+    </div>
+  `
+  //console.log('[DEBUG] createPaymentCard completado');
+  return card
+}
+
+// Show tab
+function showTab(tabId) {
+  //console.log('[DEBUG] Entrando a showTab');
+  const tabContents = document.querySelectorAll(".tab-content")
+  tabContents.forEach((tab) => {
+    tab.classList.add("hidden")
+  })
+  const activeTab = document.getElementById(tabId)
+  if (activeTab) {
+    activeTab.classList.remove("hidden")
+  }
+  //console.log('[DEBUG] showTab completado');
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  //console.log('[DEBUG] Entrando a setupEventListeners');
+  // Menu navigation
+  const menuButtons = document.querySelectorAll("#menuNav button, .px-4 button")
+  menuButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetTab = button.getAttribute("data-tab")
+      if (targetTab) {
+        showTab(targetTab)
+        menuButtons.forEach((btn) => btn.classList.remove("active-tab"))
+        button.classList.add("active-tab")
+      }
+    })
+  })
+
+  // Logout button
+  const logoutBtn = document.getElementById("cerrarSesionBtn")
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", handleLogout)
+  }
+  //console.log('[DEBUG] setupEventListeners completado');
+}
+
+// Handle logout
+function handleLogout() {
+  //console.log('[DEBUG] Entrando a handleLogout');
+  const currentCountry = apiService.getCurrentCountry()
+  const countryInfo = COUNTRIES[currentCountry]
+
+  if (confirm(`¿Cerrar sesión ?`)) {
+    logout()
+  }
+  //console.log('[DEBUG] handleLogout completado');
+}
+
+// Evento para traer datos de curso al seleccionar
+const courseSelector = document.getElementById('courseSelector');
+if (courseSelector) {
+  courseSelector.addEventListener('change', async function(e) {
+    //console.log('[DEBUG] Entrando a evento de cambio de curso');
+    const courseId = e.target.value;
+    if (!courseId) return;
+    try {
+      // Mostrar loading o feedback si quieres
+      // --- DEBUG INICIO ---
+      const token = apiService.getAuthToken();
+      const country = localStorage.getItem('selectedCountry');
+      const countryMap = {
+        argentina: 'ar',
+        uruguay: 'uy',
+        paraguay: 'py',
+        studio_beauty: 'sb'
+      };
+      const apiCountry = countryMap[country] || country;
+      //console.log('[DEBUG] Token:', token);
+      //console.log('[DEBUG] País (localStorage):', country);
+      //console.log('[DEBUG] País para API:', apiCountry);
+      //console.log('[DEBUG] ID Curso:', courseId);
+      if (!token || !apiCountry || !courseId) {
+        console.warn('[DEBUG] Faltan parámetros para la petición:', { token, apiCountry, courseId });
+        alert('Faltan parámetros para la petición. Verifica token, país y curso.');
+        mostrarEstadoVacio();
+        return;
+      }
+      const params = new URLSearchParams({ pais: apiCountry, token, idcur: courseId }).toString();
+      const urlFinal = `/cursos/datos.php?${params}`;
+      //  console.log('[DEBUG] URL final:', urlFinal);
+      
+      // Mostrar loader
+      const overlay = document.getElementById('apiOverlay');
+      if (overlay) {
+        overlay.classList.remove('hidden');
+      }
+      
+      // --- DEBUG FIN ---
+      let data;
+      try {
+        //console.log('[DEBUG] Llamando a getCursoData');
+        data = await apiService.getCursoData(courseId);
+        //console.log('[DEBUG] Respuesta de getCursoData:', data);
+      } catch (err) {
+        console.error('[DEBUG] Error completo al obtener datos del curso:', err);
+        alert('Error de conexión o de API: ' + (err && err.message ? err.message : err));
+        mostrarEstadoVacio();
+      } finally {
+        // Ocultar loader
+        if (overlay) {
+          overlay.classList.add('hidden');
+        }
+      }
+      
+      // Actualizar la UI con los datos completos del curso
+      if (data) {
+        //console.log('[DEBUG] Llamando a mostrarDetallesCurso');
+        mostrarDetallesCurso(data);
+      } else {
+        alert('La respuesta de la API no contiene datos válidos.');
+        mostrarEstadoVacio();
+      }
+    } catch (err) {
+      console.error('Error al obtener datos del curso:', err);
+      // showToast('No se pudo cargar la información del curso', 'error');
+    }
+    //console.log('[DEBUG] Evento de cambio de curso completado');
+  });
+}
+
+// Toggle dark mode
+const darkToggleBtn = document.getElementById('toggleDarkMode');
+if (darkToggleBtn) {
+  darkToggleBtn.addEventListener('click', function() {
+    //  console.log('[DEBUG] Entrando a evento de cambio de modo oscuro');
+    document.body.classList.toggle('dark');
+    // Guardar preferencia
+    if (document.body.classList.contains('dark')) {
+      localStorage.setItem('darkMode', '1');
+    } else {
+      localStorage.setItem('darkMode', '0');
+    }
+    //console.log('[DEBUG] Evento de cambio de modo oscuro completado');
+  });
+  // Al cargar, aplica preferencia guardada
+  if (localStorage.getItem('darkMode') === '1') {
+    document.body.classList.add('dark');
+  }
+}
+
+// Mostrar detalles del curso en la UI
+function mostrarDetallesCurso(curso) {
+  //console.log('[DEBUG] Entrando a mostrarDetallesCurso');
+  const emptyState = document.getElementById('emptyState');
+  const courseDetails = document.getElementById('courseDetails');
+  const courseName = document.getElementById('courseName');
+  const courseStatus = document.getElementById('courseStatus');
+  const courseDates = document.getElementById('courseDates');
+  const progressText = document.getElementById('progressText');
+  const paymentStatus = document.getElementById('paymentStatus');
+  const paymentAmount = document.getElementById('paymentAmount');
+  const paymentDue = document.getElementById('paymentDue');
+  const payButton = document.getElementById('payButton');
+  const examFeeCard = document.getElementById('examFeeCard');
+  const examFeeStatus = document.getElementById('examFeeStatus');
+  const examFeeAmount = document.getElementById('examFeeAmount');
+  const examFeeDue = document.getElementById('examFeeDue');
+  const payExamFeeButton = document.getElementById('payExamFeeButton');
+
+
+
+  if (emptyState) emptyState.classList.add('hidden');
+  if (courseDetails) courseDetails.classList.remove('hidden');
+
+  // Actualizar detalles del curso
+  courseName.textContent = curso.textoplan;
+  courseStatus.textContent = curso.estado;
+  courseDates.textContent = curso.fecha;
+  // Update circular progress
+  const progressCircle = document.getElementById('progressCircle');
+  const progressPercentage = document.getElementById('progressPercentage');
+  const estimatedTime = document.getElementById('estimatedTime');
+  
+  if (progressCircle && progressPercentage) {
+    const percentage = parseInt(curso.avance) || 0;
+    const circumference = 2 * Math.PI * 64; // radius = 64
+    const offset = circumference - (percentage / 100) * circumference;
+    
+    progressCircle.style.strokeDashoffset = offset;
+    progressPercentage.textContent = `${percentage}%`;
+  }
+  
+  if (progressText) {
+    progressText.textContent = `${curso.avance}% completado`;
+  }
+  
+  // Calculate estimated time (example calculation)
+  if (estimatedTime) {
+    const remaining = 100 - (parseInt(curso.avance) || 0);
+    const estimatedHours = Math.ceil(remaining * 0.5); // Estimate 0.5 hours per percentage point
+    estimatedTime.textContent = remaining > 0 ? `${estimatedHours}h restantes` : 'Completado';
+  }
+
+  // Actualizar estado de cuota regular
+  if (curso.cuotas && Array.isArray(curso.cuotas)) {
+    // Buscar la cuota regular más próxima
+    const regularCuota = curso.cuotas.find(c => c.cuota !== '99');
+    if (regularCuota) {
+      // Buscar la última cuota NO PAGADA (excluyendo cuota 99)
+      const cuotasFiltradas = curso.cuotas.filter(c => c.cuota !== '99');
+      const ultimaNoPagada = [...cuotasFiltradas].reverse().find(c => c.pagado != 1 && c.pagado != 2);
+      let cuotaMostrar = ultimaNoPagada || cuotasFiltradas[cuotasFiltradas.length - 1];
+      const pagada = cuotaMostrar.pagado == 1 || cuotaMostrar.pagado == 2;
+      paymentStatus.textContent = pagada ? 'Pagada' : 'Pendiente';
+      paymentStatus.className = pagada 
+        ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+        : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+      paymentAmount.textContent = cuotaMostrar.importe;
+      paymentDue.textContent = cuotaMostrar.mes;
+      payButton.classList.add('hidden'); // Ocultar el botón de pagar para todas las cuotas
+      // Botón para ver cuenta corriente
+      let verCuentaBtn = document.getElementById('verCuentaCorrienteBtn');
+      if (!verCuentaBtn) {
+        verCuentaBtn = document.createElement('button');
+        verCuentaBtn.id = 'verCuentaCorrienteBtn';
+        verCuentaBtn.className = 'mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+        verCuentaBtn.innerHTML = '<i class="fa-solid fa-list mr-2"></i>Ver cuenta corriente';
+        payButton.parentElement.appendChild(verCuentaBtn);
+      }
+      verCuentaBtn.onclick = () => {
+        // Ocultar panel detalle
+        const detalles = document.querySelector('#courseDetails [class*="lg:col-span-2"]');
+        const sidebar = document.querySelector('#courseDetails > div > div.space-y-4');
+        if (detalles) detalles.style.display = 'none';
+        if (sidebar) {
+          // Ocultar toda la barra lateral
+          sidebar.style.display = 'none';
+        }
+        // Mostrar cuenta corriente
+        const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
+        if (cuentaContainer) {
+          cuentaContainer.style.display = '';
+          cuentaContainer.innerHTML = '';
+          let volverBtn = document.getElementById('volverDatosCursoBtn');
+          if (!volverBtn) {
+            volverBtn = document.createElement('button');
+            volverBtn.id = 'volverDatosCursoBtn';
+            volverBtn.className = 'mb-4 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+            volverBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i>Volver a los datos del curso';
+            cuentaContainer.parentElement.insertBefore(volverBtn, cuentaContainer);
+          }
+          volverBtn.onclick = () => {
+            // Mostrar panel detalle
+            if (detalles) detalles.style.display = '';
+            if (sidebar) sidebar.style.display = '';
+            // Volver a mostrar panel Estado de Cuota
+            if (estadoCuotaCard) estadoCuotaCard.style.display = '';
+            // Volver a mostrar panel Derecho de Examen
+            if (derechoExamenCard) derechoExamenCard.style.display = '';
+            // Volver a mostrar panel Acciones Rápidas
+            if (accionesRapidasCard) accionesRapidasCard.style.display = '';
+            // Ocultar cuenta corriente
+            cuentaContainer.innerHTML = '';
+            volverBtn.remove();
+          };
+          mostrarHistorialCuotasEnPantalla(cuotasFiltradas, curso.textoplan);
+        }
+      };
+    }
+  }
+
+// Alternar solo cuenta corriente
+function mostrarSoloCuentaCorriente(curso) {
+  // Oculta todo menos el título
+  const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
+  const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
+  if (detalles) detalles.style.display = 'none';
+  if (sidebar) sidebar.style.display = 'none';
+  // Mostrar solo el título y la cuenta corriente
+  const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
+  if (cuentaContainer) {
+    cuentaContainer.innerHTML = '';
+    cuentaContainer.style.display = '';
+    // Botón volver
+    let volverBtn = document.getElementById('volverDatosCursoBtn');
+    if (!volverBtn) {
+      volverBtn = document.createElement('button');
+      volverBtn.id = 'volverDatosCursoBtn';
+      volverBtn.className = 'mb-4 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+      volverBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i>Volver a los datos del curso';
+      cuentaContainer.parentElement.insertBefore(volverBtn, cuentaContainer);
+    }
+    volverBtn.onclick = () => mostrarDatosCompletosCurso(curso);
+    mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
+  }
+}
+
+function mostrarDatosCompletosCurso(curso) {
+  // Mostrar todos los datos
+  const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
+  const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
+  if (detalles) detalles.style.display = '';
+  if (sidebar) sidebar.style.display = '';
+  // Quitar botón volver
+  let volverBtn = document.getElementById('volverDatosCursoBtn');
+  if (volverBtn) volverBtn.remove();
+  // Limpiar cuenta corriente
+  mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
+}
+
+// Mostrar historial de cuotas en pantalla
+function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
+  const container = document.getElementById('cuentaCorrienteContainer');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="bg-white rounded-lg shadow-lg p-2 sm:p-6 mb-6">
+      <h3 class="text-xl font-bold mb-4">Cuenta Corriente - ${nombreCurso}</h3>
+      <!-- Desktop Table -->
+      <div class="hidden sm:block overflow-x-auto">
+        <table class="min-w-full text-sm text-left border">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="py-2 px-2 border">#</th>
+              <th class="py-2 px-2 border">Mes</th>
+              <th class="py-2 px-2 border">Importe</th>
+              <th class="py-2 px-2 border">Pagado</th>
+              <th class="py-2 px-2 border">Pronto Pago</th>
+              <th class="py-2 px-2 border">Vencimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cuotas.map(c => `
+              <tr>
+                <td class="py-1 px-2 border">${c.cuota}</td>
+                <td class="py-1 px-2 border">${c.mes}</td>
+                <td class="py-1 px-2 border">$${parseFloat(c.importe).toLocaleString('es-AR', {minimumFractionDigits:2})}</td>
+                <td class="py-1 px-2 border">${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</td>
+                <td class="py-1 px-2 border">${c.ppago && c.ppago !== '0.00' ? '$'+parseFloat(c.ppago).toLocaleString('es-AR', {minimumFractionDigits:2}) : '-'}</td>
+                <td class="py-1 px-2 border">${c.fechaven}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <!-- Mobile List -->
+      <div class="block sm:hidden space-y-2">
+        ${cuotas.map(c => `
+          <div class="bg-gray-50 rounded-lg p-3 border flex flex-col text-xs">
+            <div class="flex justify-between"><span class="font-semibold">Cuota:</span> <span>${c.cuota}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Mes:</span> <span>${c.mes}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Importe:</span> <span>$${parseFloat(c.importe).toLocaleString('es-AR', {minimumFractionDigits:2})}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Pagado:</span> <span>${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Pronto Pago:</span> <span>${c.ppago && c.ppago !== '0.00' ? '$'+parseFloat(c.ppago).toLocaleString('es-AR', {minimumFractionDigits:2}) : '-'}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Vencimiento:</span> <span>${c.fechaven}</span></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+  // Configurar enlace de descarga de constancia
+  const descargarConstanciaBtn = document.getElementById('descargarConstanciaBtn');
+  if (descargarConstanciaBtn) {
+    if (curso.certificado_regular) {
+      descargarConstanciaBtn.href = curso.certificado_regular;
+      descargarConstanciaBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      descargarConstanciaBtn.title = '';
+    } else {
+      descargarConstanciaBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      descargarConstanciaBtn.title = 'Constancia no disponible';
+    }
+  }
+
+  // Actualizar certificados
+  if (curso.certificados && Array.isArray(curso.certificados)) {
+    const certificateContent = document.getElementById('certificateContent');
+    const certificateContentMobile = document.getElementById('certificateContentMobile');
+
+    function buildCertificateCard(cert, avanceCurso) {
+      const pagado = cert.pagado === 1;
+      const disponible = cert.disponible === true;
+      const notaValida = cert.nota && cert.nota > 0;
+    
+      const bordeColor = pagado ? 'border-t-4 border-green-500' : 'border-t-4 border-orange-500';
+      const iconBg = pagado ? 'bg-green-500' : 'bg-orange-500';
+      const iconoEstado = pagado ? '✅' : '⏳';
+    
+      const botonesHTML = disponible && pagado ? `
+        <div class="flex flex-col sm:flex-row gap-2 mt-4">
+          <button 
+            class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded focus:outline-none focus:ring focus:ring-blue-300"
+            onclick="window.open('${cert.linkcertificado}', '_blank')"
+            aria-label="Imprimir certificado de ${cert.titulo}">
+            🖨️ <span>Certificado</span>
+          </button>
+          <button 
+            class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 rounded focus:outline-none focus:ring focus:ring-gray-400"
+            onclick="window.open('${cert.linkcredencial}', '_blank')"
+            aria-label="Imprimir credencial de ${cert.titulo}">
+            🖨️ <span>Credencial</span>
+          </button>
+        </div>
+      ` : `
+        <div class="mt-4 text-sm font-medium text-orange-600">
+          ${!pagado ? 'Pendiente de pago' : 'No disponible'}
+        </div>
+      `;
+    
+      const notaHTML = notaValida
+        ? `<span class="inline-block bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">Nota: ${cert.nota}</span>`
+        : '';
+    
+      return `
+        <div class="swiper-slide h-full">
+          <article class="card h-full flex flex-col justify-between p-4 rounded-lg shadow-md bg-white ${bordeColor}" tabindex="0">
+            <div>
+              <div class="flex items-start gap-4">
+                <div class="estado-icon ${iconBg} text-white w-10 h-10 flex items-center justify-center rounded-full text-lg" aria-hidden="true">
+                  ${iconoEstado}
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900">${cert.titulo}</h3>
+                  <div class="text-sm text-gray-500 mt-1">${cert.tipo}</div>
+                  ${notaHTML ? `<div class="mt-2">${notaHTML}</div>` : ''}
+                </div>
+              </div>
+            </div>
+            ${botonesHTML}
+          </article>
+        </div>
+      `;
+    }
+    
+    
+    // Ordenar: primero Certificado Final, luego el resto
+    const certificadosOrdenados = [...curso.certificados].sort((a, b) => {
+      if (a.tipo === 'Certificado Final' && b.tipo !== 'Certificado Final') return -1;
+      if (a.tipo !== 'Certificado Final' && b.tipo === 'Certificado Final') return 1;
+      return 0;
+    });
+
+    const swiperWrapper = document.getElementById('swiper-certificates');
+    if (swiperWrapper) {
+      swiperWrapper.innerHTML = certificadosOrdenados
+        .map(cert => buildCertificateCard(cert, curso.avance))
+        .join('');
+    
+      // PASO 2: Iniciar Swiper.js después de insertar las cards
+      new Swiper('.mySwiper', {
+        slidesPerView: 1.2,
+        spaceBetween: 16,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          640: { slidesPerView: 1.3 },
+          1024: { slidesPerView: 1.5 },
+        }
+      });
+    }
+    
+  }
+
+
+
+  // Actualizar estado del derecho de examen
+  if (curso.cuotas && Array.isArray(curso.cuotas)) {
+    const examCuota = curso.cuotas.find(c => c.cuota === '99');
+    if (examCuota) {
+      examFeeCard.classList.remove('hidden');
+      const examPagada = examCuota.pagado == 1 || examCuota.pagado == 2;
+      examFeeStatus.textContent = examPagada ? 'Pagada' : 'Pendiente';
+      examFeeStatus.className = examPagada 
+        ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
+        : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+      
+      examFeeAmount.textContent = examCuota.importe;
+      examFeeDue.textContent = examCuota.mes;
+      if(!examPagada) {
+        payExamFeeButton.classList.remove('hidden');
+        payExamFeeButton.onclick = () => pagarCuotaExamen(examCuota);
+      } else {
+        payExamFeeButton.classList.add('hidden');
+      }
+       // Ocultar el botón de pagar para derecho de examen
+    }
+  }
+
+  function pagarCuotaExamen(cuota) {
+    const confirmacion = confirm(`¿Deseas proceder con el pago del derecho de examen por $${cuota.importe}?`)
+  
+    if (confirmacion) {
+      // Mostrar mensaje de procesamiento
+      window.showToast("Redirigiendo al sistema de pagos...", "info")
+  
+      // Aquí puedes integrar con tu sistema de pagos real
+      // Ejemplo: window.location.href = `https://tu-sistema-pagos.com/pagar?cuota=99&monto=${cuota.importe}`;
+  
+      console.log("[v0] Iniciando pago para cuota 99:", {
+        cuota: cuota.cuota,
+        importe: cuota.importe,
+        mes: cuota.mes,
+      })
+  
+      // Simulación de éxito (remover en producción)
+      setTimeout(() => {
+        window.showToast("Pago procesado correctamente", "success")
+      }, 2000)
+    }
+  }
+
+  // Función para manejar el menú desplegable
+  function toggleDropdown(event, certType) {
+    event.preventDefault();
+    const button = event.currentTarget;
+    const dropdownMenu = button.nextElementSibling;
+    const currentDropdowns = document.querySelectorAll('.dropdown-menu:not(.hidden)');
+    
+    // Cerrar otros dropdowns abiertos
+    currentDropdowns.forEach(menu => {
+      if (menu !== dropdownMenu) {
+        menu.classList.add('hidden');
+      }
+    });
+    
+    // Alternar este dropdown
+    dropdownMenu.classList.toggle('hidden');
+    
+    // Actualizar aria-expanded
+    button.setAttribute('aria-expanded', !dropdownMenu.classList.contains('hidden'));
+  }
+
+  // Cerrar dropdowns al hacer clic fuera
+  document.addEventListener('click', (event) => {
+    const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+    const buttons = document.querySelectorAll('[aria-haspopup="true"]');
+    
+    dropdownMenus.forEach(menu => {
+      if (!menu.contains(event.target) && !buttons.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+  });
+
+  //console.log('[DEBUG] mostrarDetallesCurso completado');
+}
+
+// Llena el select de cursos
+function poblarSelectorCursos(cursos) {
+  //console.log('[DEBUG] Entrando a poblarSelectorCursos');
+  const select = document.getElementById('courseSelector');
+  //console.log('[DEBUG] Select encontrado:', !!select);
+  
+  if (!select) {
+    console.error('[ERROR] No se encontró el select con id courseSelector');
+    console.error('[ERROR] HTML actual del documento:', document.body.innerHTML);
+    return;
+  }
+
+  //console.log('[DEBUG] Cursos recibidos:', cursos);
+  //console.log('[DEBUG] Tipo de cursos:', typeof cursos);
+  
+  // Verificar si cursos es un objeto y convertirlo a array si es necesario
+  if (typeof cursos === 'object' && !Array.isArray(cursos)) {
+    //console.log('[DEBUG] Convertir objeto a array');
+    cursos = Object.values(cursos);
+  }
+
+  // Opción inicial
+  select.innerHTML = '<option value="">Selecciona un curso...</option>';
+  
+  if (!Array.isArray(cursos)) {
+    console.error('[ERROR] El parámetro cursos no es un array:', cursos);
+    console.error('[ERROR] Tipo recibido:', typeof cursos);
+    return;
+  }
+
+  if (cursos.length === 0) {
+    console.warn('[WARNING] No hay cursos disponibles');
+    return;
+  }
+
+    //console.log('[DEBUG] Procesando', cursos.length, 'cursos');
+  
+  cursos.forEach((curso, idx) => {
+    //console.log(`[DEBUG] Procesando curso [${idx}]:`, curso);
+    
+    if (!curso || !curso.id || !curso.nombre) {
+      console.error('[ERROR] Curso inválido:', curso);
+      return;
+    }
+
+    const option = document.createElement('option');
+    option.value = curso.id;
+    option.textContent = curso.nombre;
+    select.appendChild(option);
+    //console.log(`[DEBUG] Agregada opción para curso ${curso.id}:`, curso.nombre);
+  });
+
+  //console.log('[DEBUG] Select final:', select.innerHTML);
+  //console.log('[DEBUG] Total de opciones:', select.options.length);
+  //console.log('[DEBUG] poblarSelectorCursos completado');
+}

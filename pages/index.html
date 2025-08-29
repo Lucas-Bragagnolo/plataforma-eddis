@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma de Alumno - PSI</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Stolzl:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://use.typekit.net/yls5rgk.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Swiper JS CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <!-- Carga dinámica del tema según entidad -->
+  <script>
+    (function () {
+      const entidad = localStorage.getItem('lastLoginCountry');
+      const link = document.createElement('link');
+      let themeHref;
+      if (['ar', 'uy', 'py'].includes(entidad)) {
+        themeHref = '../css/theme-eddis.css';
+      } else {
+        themeHref = '../css/theme-studiobeauty.css';
+      }
+      link.rel = 'stylesheet';
+      link.id = 'theme-css';
+      link.href = themeHref;
+      document.head.appendChild(link);
+
+    })();
+  </script>
+
+</head>
+
+<body class="flex min-h-screen bg-gray-100">
+  <!-- Overlay para móviles -->
+  <div id="overlay" class="fixed inset-0 bg-black opacity-50 z-30 hidden md:hidden"></div>
+
+  <!-- Overlay para loader de API -->
+  <div id="apiOverlay" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+    <div class="loader-container">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-darkmode border-t-transparent"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+    class="fixed z-40 top-0 left-0 h-full bg-menu shadow-md transition-all duration-300 sidebar-collapsed">
+    <div class="flex flex-col h-full justify-between">
+      <!-- Zona superior -->
+      <div>
+
+        <!-- Menú de navegación -->
+        <nav class="flex flex-col px-4 mt-4 space-y-2" id="menuNav">
+          <button class="menu-item flex items-center space-x-2 p-2 rounded active-tab" data-tab="tab-cursos-actuales">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span class="menu-text">Cursos</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Zona inferior -->
+      <div>
+        <div class="px-4 py-2 border-t border-gray-200">
+          <button class="menu-item flex items-center space-x-2 p-2 rounded w-full mb-1" data-tab="tab-configuracion">
+            <i class="fa-solid fa-pencil-alt"></i>
+            <span class="menu-text">Editar datos</span>
+          </button>
+          <button class="menu-item flex items-center space-x-2 p-2 rounded w-full mb-1" id="irSitioWeb">
+            <i class="fa-solid fa-globe"></i>
+            <span class="menu-text">Sitio Web</span>
+          </button>
+          <button class="menu-item flex items-center space-x-2 p-2 rounded w-full mb-1" id="cerrarSesionBtn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="menu-text">Cerrar Sesión</span>
+          </button>
+        </div>
+        <!-- Card de Usuario -->
+        <div class="flex items-center p-4 border-t border-gray-200" id="userCard">
+          <i class="fa-solid fa-user-circle  text-3xl"></i>
+          <div id="userInfo" class="ml-2">
+            <p class="text-sm " id="nombreUsuario"></p>
+            <p class="text-xs ">Alumno/a</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Área de Contenido -->
+  <div class="flex-1 flex flex-col main-content">
+    <!-- Encabezado -->
+    <header class="flex items-center justify-between p-1 bg-header">
+      <!-- Botón móvil para mostrar el sidebar -->
+
+      <div class="flex items-center">
+
+        <img id="logoEntidad" class="h-20 w-auto" />
+      </div>
+      <button id="toggleDarkMode" class="hover:text-black text-xl mr-4">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </header>
+
+    <!-- Contenido principal con tabs -->
+    <main class="flex-1 p-2 ">
+      <!-- Tab: Cursos Actuales -->
+      <div id="tab-cursos-actuales" class="tab-content">
+
+        <!-- Mensaje en Vacio -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-2">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div class="mb-4 sm:mb-0">
+              <h2 class="text-lg sm:text-lg text-base font-medium text-gray-900 mb-1">Seleccionar Curso</h2>
+              <p class="text-sm sm:text-sm text-xs text-gray-500">Elige un curso para ver sus detalles</p>
+            </div>
+            <div class="w-full sm:w-auto sm:min-w-[300px]">
+              <div class="relative">
+                <select id="courseSelector"
+                  class="course-selector w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 shadow-sm"></select>
+                <div id="apiLoader" class="hidden absolute right-2 top-1/2 -translate-y-1/2">
+                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-darkmode"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Details Area -->
+        <div id="courseDetails" class="hidden fade-in">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
+            <!-- Historial de cuotas responsive -->
+            <div class="lg:col-span-3" id="cuentaCorrienteContainer"></div>
+            <!-- Main Course Info -->
+            <div class="lg:col-span-2 space-y-2">
+              <!-- Course Header -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h3 id="courseName" class="text-2xl font-bold text-gray-900 mb-2"></h3>
+                    <div class="flex items-center space-x-4">
+                      <span id="courseStatus"
+                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></span>
+                      <span id="courseDates" class="text-sm text-gray-500"></span>
+                    </div>
+                  </div>
+                  <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <i class="fa-solid fa-book-open text-blue-600"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Section -->
+              <div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-gray-200 dark:border-border-dark p-6">
+                <div class="flex items-center justify-between mb-6">
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-text-dark">Progreso del Curso</h4>
+                </div>
+
+                <!-- Circular Progress Container -->
+                <div class="flex flex-col lg:flex-row items-center gap-8">
+                  <!-- Circular Progress -->
+                  <div class="flex-shrink-0">
+                    <div class="relative w-40 h-40">
+                      <!-- Background Circle -->
+                      <svg class="w-40 h-40 transform -rotate-90" viewBox="0 0 144 144">
+                        <circle cx="72" cy="72" r="64" stroke="currentColor" stroke-width="8" fill="none"
+                          class="text-gray-200 dark:text-gray-600" />
+                        <!-- Progress Circle -->
+                        <circle id="progressCircle" cx="72" cy="72" r="64" stroke="currentColor" stroke-width="8"
+                          fill="none" stroke-linecap="round"
+                          class="text-primary-darkmode transition-all duration-1000 ease-out" stroke-dasharray="402.12"
+                          stroke-dashoffset="402.12" />
+                      </svg>
+                      <!-- Percentage Text -->
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                          <div id="progressPercentage" class="text-4xl font-bold text-gray-900 dark:text-text-dark">0%
+                          </div>
+                          <div class="text-xs text-gray-500 dark:text-text-dark-secondary mt-1">Completado</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Progress Stats -->
+                  <div class="flex-1 w-full">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="completedLessons">0</div>
+                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Lecciones Completadas</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="totalLessons">0</div>
+                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Total Lecciones</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="studyHours">0</div>
+                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Horas de Estudio</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="averageScore">0</div>
+                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Promedio</div>
+                      </div>
+                    </div>
+
+                    <!-- Progress Details -->
+                    <div class="mt-6 space-y-3">
+                      <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Progreso actual</span>
+                        <span id="progressText" class="text-sm font-medium text-primary-darkmode"></span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Tiempo estimado
+                          restante</span>
+                        <span id="estimatedTime" class="text-sm font-medium text-gray-900 dark:text-text-dark">--</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="tab-pagos" class="tab-content hidden">
+                <h2 class="text-2xl font-bold mb-6">Historial de Pagos</h2>
+                <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3" id="contenedor-pagos">
+                  <!-- Los pagos se cargarán dinámicamente -->
+                </div>
+              </div>
+              <!-- Certificate Section: visible solo en lg+ -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden lg:block">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-medium text-gray-900">Certificados</h4>
+                  <i class="fa-solid fa-award text-gray-400"></i>
+                </div>
+                <!-- Carrusel de certificados -->
+                <div id="certificateContent" class="swiper mySwiper">
+                  <div class="swiper-wrapper" id="swiper-certificates">
+                    <!-- Las cards se insertarán aquí con JS como .swiper-slide -->
+                  </div>
+
+                  <!-- Flechas -->
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+
+                  <!-- Paginación opcional -->
+                  <div class="swiper-pagination"></div>
+                </div>
+
+
+              </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-4">
+              <!-- Quick Actions -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Acciones Rápidas</h4>
+                <div class="space-y-3">
+                  <a id="descargarConstanciaBtn" target="_blank"
+                    class="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center">
+                    <i class="fa-solid fa-download text-purple-600 mr-3"></i>
+                    <span class="text-sm text-gray-700">Constancia alumno regular</span>
+                </a>
+
+                </div>
+              </div>
+              <!-- Payment Status -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-medium text-gray-900">Estado de Cuota</h4>
+                  <i class="fa-solid fa-credit-card text-gray-400"></i>
+                </div>
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Estado:</span>
+                    <span id="paymentStatus"
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"></span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Monto:</span>
+                    <span id="paymentAmount" class="text-sm font-medium text-gray-900"></span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Vencimiento:</span>
+                    <span id="paymentDue" class="text-sm text-gray-900"></span>
+                  </div>
+                  <button id="payButton"
+                    class="hidden w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    <i class="fa-solid fa-credit-card mr-2"></i>
+                    Pagar Cuota
+                  </button>
+                </div>
+              </div>
+
+              <!-- Exam Fee Status -->
+              <div id="examFeeCard" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-medium text-gray-900">Derecho de Examen</h4>
+                  <i class="fa-solid fa-graduation-cap text-gray-400"></i>
+                </div>
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Estado:</span>
+                    <span id="examFeeStatus"
+                      class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"></span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Monto:</span>
+                    <span id="examFeeAmount" class="text-sm font-medium text-gray-900"></span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Vencimiento:</span>
+                    <span id="examFeeDue" class="text-sm text-gray-900"></span>
+                  </div>
+                  <button id="payExamFeeButton"
+                    class="hidden w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>
+                    Pagar Examen
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12">
+          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-book-open text-gray-400 text-5xl"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Selecciona un curso</h3>
+          <p class="text-gray-500 max-w-sm mx-auto">Elige un curso del menú desplegable para ver toda la información
+            detallada y gestionar tu progreso.</p>
+        </div>
+      </div>
+
+      <!-- Tab: Pagos -->
+
+
+      <!-- Tab: Configuración -->
+      <div id="tab-configuracion" class="tab-content hidden">
+        <h2 class="text-2xl font-bold mb-6">Mi Perfil</h2>
+        <div class="max-w-3xl mx-auto grid md:grid-cols-2 gap-8">
+          <!-- Perfil Minimalista -->
+          <div class="bg-white dark:bg-card-dark shadow-sm rounded-xl p-6 flex flex-col gap-6 justify-between">
+            <div class="flex items-center gap-4 relative">
+              <i class="fa-solid fa-user-circle text-5xl text-gray-400 dark:text-gray-dark"></i>
+              <!-- Botón actualizar foto -->
+              <button type="button" id="btnActualizarFoto"
+                class="absolute left-8 bottom-0 bg-white dark:bg-bg-dark-secondary border border-gray-200 dark:border-border-dark rounded-full p-1 shadow hover:bg-gray-100 dark:hover:bg-card-dark transition"
+                title="Actualizar foto de perfil">
+                <i class="fa-solid fa-camera text-xs text-gray-500 dark:text-gray-dark"></i>
+                <input type="file" id="inputFotoPerfil" accept="image/*" class="hidden" />
+              </button>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-text-dark" id="userNombre">Juan Pérez</h3>
+                <p class="text-xs text-gray-500 dark:text-text-dark-secondary" id="userEmail">juan.perez@email.com</p>
+                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                  <span class="text-xs text-gray-400 dark:text-gray-dark">Legajo: <span id="userLegajo"
+                      class="font-medium text-gray-600 dark:text-text-dark-secondary">20231234</span></span>
+                  <span class="text-xs text-gray-400 dark:text-gray-dark">Documento: <span id="userDocumento"
+                      class="font-medium text-gray-600 dark:text-text-dark-secondary">38.123.456</span></span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-text-dark-secondary mt-1" id="userTelefono">+54 11 1234-5678
+                </p>
+                <p class="text-xs text-gray-400 dark:text-gray-dark mt-1" id="miembroDesde">Miembro desde: Enero 2024
+                </p>
+              </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <button id="btnRestablecerPasswd"
+                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border border-gray-300 dark:border-border-dark bg-transparent text-gray-700 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-bg-dark-secondary transition-colors">
+                <i class="fa-solid fa-key"></i>
+                <span class="text-sm">Restablecer Contraseña</span>
+              </button>
+              <button
+                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border border-gray-300 dark:border-border-dark bg-transparent text-gray-700 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-bg-dark-secondary transition-colors">
+                <i class="fa-solid fa-sign-out-alt"></i>
+                <span class="text-sm">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Editar datos minimalista -->
+          <form id="formEditarDatos" class="bg-white dark:bg-card-dark shadow-sm rounded-xl p-6 flex flex-col gap-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-dark mb-1">Teléfono</label>
+              <input type="tel" id="telefonoInput"
+                class="w-full border border-gray-200 dark:border-border-dark rounded px-3 py-2 bg-gray-50 dark:bg-bg-dark-secondary text-gray-900 dark:text-text-dark focus:ring-2 focus:ring-primary-darkmode focus:outline-none transition"
+                value="+54 11 1234-5678">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-dark mb-1">Email</label>
+              <input type="email" id="emailInput"
+                class="w-full border border-gray-200 dark:border-border-dark rounded px-3 py-2 bg-gray-50 dark:bg-bg-dark-secondary text-gray-900 dark:text-text-dark focus:ring-2 focus:ring-primary-darkmode focus:outline-none transition"
+                value="juan.perez@email.com">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 dark:text-gray-dark mb-1">Ubicación</label>
+              <input type="text" id="ubicacionInput"
+                class="w-full border border-gray-200 dark:border-border-dark rounded px-3 py-2 bg-gray-50 dark:bg-bg-dark-secondary text-gray-900 dark:text-text-dark focus:ring-2 focus:ring-primary-darkmode focus:outline-none transition"
+                value="Buenos Aires, Argentina">
+            </div>
+            <button type="submit"
+              class="mt-2 px-4 py-2 rounded border border-primary-darkmode text-primary-darkmode bg-transparent hover:bg-primary-darkmode hover:text-white dark:border-primary-darkmode dark:text-primary-darkmode dark:hover:bg-primary-darkmode dark:hover:text-white text-sm font-medium transition">Guardar
+              Cambios</button>
+          </form>
+        </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast"
+    class="hidden fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm z-50">
+    <div class="flex items-start">
+      <div class="flex-shrink-0">
+        <i id="toastIcon" class="w-5 h-5"></i>
+      </div>
+      <div class="ml-3">
+        <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+      </div>
+      <button id="toastClose" class="ml-auto flex-shrink-0">
+        <i class="fa-solid fa-x text-gray-400 hover:text-gray-600"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Bottom Bar para móviles -->
+  <nav id="bottombar"
+    class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center py-2 z-50 shadow-lg md:hidden">
+    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" data-tab="tab-cursos-actuales">
+      <i class="fa-solid fa-graduation-cap text-xl"></i>
+      <span class="text-xs">Cursos</span>
+    </button>
+    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" id="irSitioWeb">
+      <i class="fa-solid fa-globe text-xl"></i>
+      <span class="text-xs">Web</span>
+    </button>
+    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" id="cerrarSesionBtn">
+      <i class="fa-solid fa-user text-xl"></i>
+      <span class="text-xs">Perfil</span>
+    </button>
+  </nav>
+  <!-- Swiper JS -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="../js/data.js" type="module"></script>
+  <script src="../js/dashboard.js" type="module"></script>
+  <script src="../js/courses.js" type="module"></script>
+  <script src="../js/script.js" type="module"></script>
+  <script src="../js/bottombar-tabs.js" type="module"></script>
+  <script>
+    (function () {
+      const entidad = localStorage.getItem('lastLoginCountry');
+      const logo = document.getElementById('logoEntidad');
+      if (!logo) return;
+
+      // Función para actualizar el logo según el modo
+      function updateLogo() {
+        const isDarkMode = document.body.classList.contains('dark');
+
+        if (entidad === 'ar' || entidad === 'uy' || entidad === 'py') {
+          logo.src = isDarkMode ? '../assets/logo_eddis_dark.png' : '../assets/logo_fondoblanco.png';
+          logo.alt = 'Logo EDDIS';
+        } else if (entidad === 'sb') {
+          logo.src = isDarkMode ? '../assets/logo_studio_dark.png' : '../assets/logo-studio-blanco.png';
+          logo.alt = 'Logo Studio Beauty';
+        } else {
+          logo.src = isDarkMode ? '../assets/logo_eddis_dark.png' : '../assets/logo_fondoblanco.png';
+          logo.alt = 'Logo Eddis';
+        }
+      }
+
+      // Actualizar logo inicialmente
+      updateLogo();
+
+      // Escuchar cambios en el modo dark
+      const darkToggleBtn = document.getElementById('toggleDarkMode');
+      if (darkToggleBtn) {
+        darkToggleBtn.addEventListener('click', updateLogo);
+      }
+
+      // Escuchar cambios en la clase dark del body
+      new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.attributeName === 'class') {
+            updateLogo();
+          }
+        });
+      }).observe(document.body, { attributes: true });
+    })();
+  </script>
+</body>
+
+</html>

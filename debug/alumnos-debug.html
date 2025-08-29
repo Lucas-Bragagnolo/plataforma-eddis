@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Alumnos API | Plataforma Educativa</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Stolzl:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { font-family: 'Stolzl', system-ui, sans-serif; }
+        .debug-entry { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .spinner { border: 2px solid #f3f4f6; border-top: 2px solid #3b82f6; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <div class="container mx-auto p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Formulario de Debug -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Debug Alumnos API</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Debug Activo</span>
+                    </div>
+                </div>
+                <form id="alumnosForm" class="space-y-4">
+                    <div class="space-y-2">
+                        <label for="method" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-exchange-alt text-purple-500 mr-2"></i>
+                            Método
+                        </label>
+                        <select id="method" name="method" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                            <option value="POST">POST (body JSON)</option>
+                            <option value="GET">GET (query string)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="pais" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-globe text-blue-500 mr-2"></i>
+                            País (código, ej: ar, uy, py)
+                        </label>
+                        <input id="pais" name="pais" type="text" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="ar">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="token" class="block text-sm font-semibold text-gray-700">
+                            <i class="fas fa-key text-yellow-500 mr-2"></i>
+                            Token de sesión
+                        </label>
+                        <input id="token" name="token" type="text" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="Pega aquí tu token">
+                    </div>
+                    <button type="submit" class="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">Probar API</button>
+                </form>
+            </div>
+            <!-- Consola de Debug -->
+            <div class="bg-gray-900 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold">Debug Console</h2>
+                    <button id="clearDebugBtn" class="text-gray-400 hover:text-gray-200 text-sm"><i class="fas fa-broom"></i> Limpiar</button>
+                </div>
+                <div id="debugContainer" class="space-y-2 h-96 overflow-y-auto bg-gray-800 p-4 rounded-lg text-xs"></div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        const alumnosForm = document.getElementById('alumnosForm');
+        const debugContainer = document.getElementById('debugContainer');
+        const clearDebugBtn = document.getElementById('clearDebugBtn');
+
+        alumnosForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            debugLog('--- Nueva petición a <span class="text-blue-400">/alumnos/datos.php</span> ---');
+            const pais = alumnosForm.pais.value.trim();
+            const token = alumnosForm.token.value.trim();
+            const method = alumnosForm.method.value;
+            let url = '/alumnos/datos.php';
+            let fetchOptions = {};
+
+            if (method === 'GET') {
+                url += `?pais=${encodeURIComponent(pais)}&token=${encodeURIComponent(token)}`;
+                debugLog(`<span class='text-yellow-400'>Request:</span> <pre>GET ${url}</pre>`);
+                fetchOptions = { method: 'GET' };
+            } else {
+                debugLog(`<span class='text-yellow-400'>Request:</span> <pre>POST ${url}\nBody: {\n  pais: "${pais}",\n  token: "${token.slice(0, 8)}..."\n}</pre>`);
+                fetchOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pais, token })
+                };
+            }
+
+            let spinner = showSpinner();
+            try {
+                const response = await fetch(url, fetchOptions);
+                const data = await response.json();
+                debugLog(`<span class='text-green-400'>Response:</span> <pre>${JSON.stringify(data, null, 2)}</pre>`);
+            } catch (err) {
+                debugLog(`<span class='text-red-400'>Error:</span> <pre>${err}</pre>`);
+            } finally {
+                removeSpinner(spinner);
+            }
+        });
+
+        clearDebugBtn.addEventListener('click', () => {
+            debugContainer.innerHTML = `<div class='text-green-400 text-sm'><i class='fas fa-broom mr-2'></i>Consola limpia.</div>`;
+        });
+
+        function debugLog(html) {
+            const entry = document.createElement('div');
+            entry.className = 'debug-entry';
+            entry.innerHTML = html;
+            debugContainer.appendChild(entry);
+            debugContainer.scrollTop = debugContainer.scrollHeight;
+        }
+        function showSpinner() {
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner mt-2 mb-2';
+            debugContainer.appendChild(spinner);
+            debugContainer.scrollTop = debugContainer.scrollHeight;
+            return spinner;
+        }
+        function removeSpinner(spinner) {
+            if (spinner && spinner.parentNode) spinner.parentNode.removeChild(spinner);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso | Plataforma Educativa</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Stolzl:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/yls5rgk.css">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'stolzl': ['Stolzl', 'system-ui', 'sans-serif'],
+                        'albert': ['Albert Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        eddis: {
+                            primary: '#32417f',
+                            dark: '#142042',
+                            secondary: '#32417f',
+                        },
+                        studio: {
+                            primary: '#101820',
+                            secondary: '#d9d9d6',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-left': 'slideLeft 0.8s ease-out',
+                        'slide-right': 'slideRight 0.8s ease-out',
+                        'shake': 'shake 0.5s ease-in-out',
+                        'switch': 'switch 0.4s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-3px)' },
+                            '20%, 40%, 60%, 80%': { transform: 'translateX(3px)' }
+                        },
+                        switch: {
+                            '0%': { transform: 'scale(0.95)' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '100%': { transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Stolzl', system-ui, sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .login-container {
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (min-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* EDDIS Theme */
+        .theme-eddis .form-section {
+            background: #32417f;
+            font-family: 'Stolzl', system-ui, sans-serif;
+        }
+
+        .theme-eddis .glass {
+            background: rgba(255, 255, 255, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .theme-eddis .image-section {
+            background-image: url('../assets/login_edstudio.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Studio Beauty Theme */
+        .theme-studio .form-section {
+            background-color: #101820;
+            font-family: 'Albert Sans', sans-serif;
+        }
+
+        .theme-studio .glass {
+            background-color: #d9d9d6;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-studio .image-section {
+            background-image: url('../assets/login_estudio.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .form-section {
+            position: relative;
+            overflow-y: auto;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .image-section {
+            position: relative;
+            display: none;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (min-width: 768px) {
+            .image-section {
+                display: block;
+            }
+        }
+
+        .form-content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+
+
+
+        /* Toggle Switch Styles */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 0.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 0.875rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-option.active {
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .toggle-option:not(.active) {
+            color: #6b7280;
+        }
+
+        .toggle-option:not(.active):hover {
+            color: #374151;
+            transform: scale(1.01);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            width: calc(50% - 0.25rem);
+            height: calc(100% - 1rem);
+            border-radius: 25px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-eddis .toggle-slider {
+            background: linear-gradient(135deg, #32417f 0%, #1e3a8a 100%);
+        }
+
+        .theme-studio .toggle-slider {
+            background: linear-gradient(135deg, #101820 0%, #374151 100%);
+            transform: translateX(100%);
+        }
+
+        .spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .input-field {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field:focus {
+            transform: translateY(-1px);
+        }
+
+        .theme-eddis .input-field:focus {
+            box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+            border-color: #32417f;
+        }
+
+        .theme-studio .input-field {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .theme-studio .input-field:focus {
+            border-color: #101820;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .btn-primary {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .theme-eddis .btn-primary {
+            background: #32417f;
+            box-shadow: 0 8px 25px -5px rgba(50, 65, 127, 0.4);
+        }
+
+        .theme-eddis .btn-primary:hover {
+            background: #1e3a8a;
+            box-shadow: 0 12px 30px -5px rgba(50, 65, 127, 0.5);
+        }
+
+        .theme-studio .btn-primary {
+            background: #101820;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-studio .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .theme-studio .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        /* Custom scrollbar */
+        .form-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .form-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 767px) {
+            .theme-toggle {
+                top: 1rem;
+                left: 1rem;
+                right: 1rem;
+                transform: none;
+                width: calc(100% - 2rem);
+            }
+
+            .toggle-container {
+                width: 100%;
+            }
+
+            .toggle-option {
+                flex: 1;
+                justify-content: center;
+                padding: 0.75rem 1rem;
+            }
+
+            .form-content {
+                padding: 1rem;
+                padding-top: 6rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-eddis">
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <div class="toggle-container">
+            <div class="toggle-slider"></div>
+            <div class="toggle-option active" data-theme="eddis">
+
+                <span>EDDIS</span>
+            </div>
+            <div class="toggle-option" data-theme="studio">
+
+                <span>Studio Beauty</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <!-- Form Section (Left) -->
+        <div class="form-section animate-slide-left">
+            <div class="form-content">
+                <div class="login-card w-full max-w-md">
+                    <!-- Card Container -->
+                    <div class="glass rounded-2xl shadow-2xl p-6 sm:p-8 animate-switch">
+                        <!-- Header Section -->
+                        <header class="text-center mb-6">
+                            <!-- Logo -->
+                            <div class="mb-4">
+                                <div class="w-60 mx-auto bg-white rounded-2xl flex items-center justify-center mb-4"
+                                    id="logoContainer">
+                                    <img id="logoImage" src="../assets/logo_fondoblanco.png" alt="Logo"
+                                        class="w-auto h-auto object-contain">
+                                </div>
+                            </div>
+
+                            <!-- Title & Subtitle -->
+                            <div class="space-y-2">
+                                <p id="subtitle" class="text-gray-600 text-sm font-light">
+                                    Accede a tu plataforma educativa
+                                </p>
+                            </div>
+                        </header>
+
+                        <!-- Login Form -->
+                        <form id="loginForm" class="space-y-4" novalidate>
+                            <!-- Country Selector (Only for EDDIS) -->
+                            <div id="countrySection" class="space-y-2">
+                                <label for="countrySelect" class="block text-sm font-light text-gray-700">
+                                    <i class="fas fa-globe mr-2" style="color: #32417f;"></i>
+                                    Región
+                                </label>
+
+                                <div class="relative">
+                                    <select id="countrySelect" name="country" required
+                                        class="input-field w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 font-light focus:ring-2 focus:ring-opacity-50 transition-all duration-200 appearance-none cursor-pointer">
+                                        <option value="" disabled selected>Selecciona región...</option>
+                                        <option value="ar">🇦🇷 Argentina</option>
+                                        <option value="uy">🇺🇾 Uruguay</option>
+                                        <option value="py">🇵🇾 Paraguay</option>
+                                    </select>
+
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden field for Studio Beauty -->
+                            <input type="hidden" id="hiddenCountry" name="country" value="sb">
+
+                            <!-- Username Field -->
+                            <div class="space-y-2">
+                                <label for="username" class="block text-sm font-regular" id="usernameLabel">
+                                    <i class="fas fa-user mr-2" id="usernameIcon" style="color: #32417f;"></i>
+                                    <span id="usernameLabelText">Legajo</span>
+                                </label>
+
+                                <div class="relative">
+                                    <input type="text" id="username" name="username" required autocomplete="username"
+                                        class="input-field w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 font-light placeholder-gray-400 focus:ring-2 focus:ring-opacity-50"
+                                        placeholder="Ej: 1465192">
+
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4">
+                                        <i id="usernameSuccess" class="fas fa-check-circle text-green-500 hidden"></i>
+                                        <i id="usernameError" class="fas fa-exclamation-circle text-red-500 hidden"></i>
+                                    </div>
+                                </div>
+
+                                <p id="usernameErrorMsg" class="text-xs text-red-600 hidden">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    <span></span>
+                                </p>
+                            </div>
+
+                            <!-- Document Field -->
+                            <div class="space-y-2">
+                                <label for="documento" class="block text-sm font-regular" id="documentoLabel">
+                                    <i class="fas fa-id-card mr-2" id="documentoIcon" style="color: #32417f;"></i>
+                                    <span id="documentoLabelText">Documento</span>
+                                </label>
+
+                                <div class="relative">
+                                    <input type="text" id="documento" name="documento" required autocomplete="off"
+                                        class="input-field w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 font-light placeholder-gray-400 focus:ring-2 focus:ring-opacity-50"
+                                        placeholder="Ej: 16639850">
+
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4">
+                                        <i id="documentoSuccess" class="fas fa-check-circle text-green-500 hidden"></i>
+                                        <i id="documentoError"
+                                            class="fas fa-exclamation-circle text-red-500 hidden"></i>
+                                    </div>
+                                </div>
+
+                                <p id="documentoErrorMsg" class="text-xs text-red-600 hidden">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    <span></span>
+                                </p>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="pt-2">
+                                <button type="submit" id="submitBtn"
+                                    class="btn-primary w-full text-white font-regular py-3 px-6 rounded-xl shadow-lg focus:ring-4 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                    <span id="submitText" class="flex items-center justify-center">
+                                        <i class="fas fa-sign-in-alt mr-2" id="submitIcon"></i>
+                                        <span id="submitButtonText">Iniciar Sesión</span>
+                                    </span>
+
+                                    <span id="submitLoading" class="hidden flex items-center justify-center">
+                                        <div class="spinner mr-2"></div>
+                                        <span id="loadingText">Verificando...</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Footer -->
+                        <footer class="mt-6 text-center">
+                            <div class="space-y-3">
+                                <div class="relative">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="w-full border-t border-gray-200"></div>
+                                    </div>
+                                    <div class="relative flex justify-center text-xs">
+                                        <span class="bg-white px-3 text-gray-500 font-light">¿Necesitas ayuda?</span>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="supportBtn"
+                                    class="text-sm font-light text-gray-600 hover:opacity-75 transition-colors duration-200">
+                                    <i class="fas fa-headset mr-2"></i>
+                                    <span id="supportText">Soporte técnico</span>
+                                </button>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Section (Right) -->
+        <div class="image-section animate-slide-right">
+            <div class="image-content">
+                <div class="image-overlay">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300 ease-out">
+        <div class="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-sm">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i id="toastIcon" class="w-5 h-5"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p id="toastMessage" class="text-sm font-light text-gray-900"></p>
+                </div>
+                <button id="toastClose"
+                    class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay"
+        class="hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 flex items-center space-x-4">
+            <div class="spinner"></div>
+            <span class="text-gray-700 font-light" id="overlayLoadingText">Verificando credenciales...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { handleLogin } from '../js/auth.js';
+        import { setupToastClose } from '../js/utils.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupUnifiedLogin();
+            setupToastClose();
+        });
+
+        function setupUnifiedLogin() {
+            const form = document.getElementById('loginForm');
+
+            setupThemeToggle();
+            setupFormValidation();
+
+            if (form) {
+                form.addEventListener('submit', handleUnifiedLogin);
+            }
+
+            focusFirstEmptyField();
+        }
+
+        function setupThemeToggle() {
+            const toggleOptions = document.querySelectorAll('.toggle-option');
+            const body = document.body;
+
+            toggleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const theme = option.dataset.theme;
+                    switchTheme(theme);
+                });
+            });
+
+            // Initialize with EDDIS theme
+            switchTheme('eddis');
+        }
+
+        function switchTheme(theme) {
+            const body = document.body;
+            const toggleOptions = document.querySelectorAll('.toggle-option');
+
+            // Update body class
+            body.className = `theme-${theme}`;
+
+            // Update toggle active state
+            toggleOptions.forEach(option => {
+                if (option.dataset.theme === theme) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+
+            // Update content based on theme
+            updateThemeContent(theme);
+
+            // Add animation class
+            const card = document.querySelector('.glass');
+            card.classList.add('animate-switch');
+            setTimeout(() => {
+                card.classList.remove('animate-switch');
+            }, 400);
+        }
+
+        function updateThemeContent(theme) {
+            const elements = {
+                logoImage: document.getElementById('logoImage'),
+                subtitle: document.getElementById('subtitle'),
+                countrySection: document.getElementById('countrySection'),
+                hiddenCountry: document.getElementById('hiddenCountry'),
+                countrySelect: document.getElementById('countrySelect'),
+                usernameLabelText: document.getElementById('usernameLabelText'),
+                usernameIcon: document.getElementById('usernameIcon'),
+                documentoLabelText: document.getElementById('documentoLabelText'),
+                documentoIcon: document.getElementById('documentoIcon'),
+                usernameInput: document.getElementById('username'),
+                submitButtonText: document.getElementById('submitButtonText'),
+                submitIcon: document.getElementById('submitIcon'),
+                loadingText: document.getElementById('loadingText'),
+                overlayLoadingText: document.getElementById('overlayLoadingText'),
+                supportText: document.getElementById('supportText'),
+            };
+
+            if (theme === 'eddis') {
+                // EDDIS Theme
+                elements.logoImage.src = '../assets/logo_fondoblanco.png';
+                elements.logoImage.alt = 'Logo EDDIS';
+                elements.subtitle.textContent = 'Accede a tu plataforma educativa';
+                elements.countrySection.style.display = 'block';
+                elements.hiddenCountry.disabled = true;
+                elements.countrySelect.disabled = false;
+                elements.countrySelect.required = true;
+                elements.usernameLabelText.textContent = 'Legajo';
+                elements.usernameIcon.style.color = '#32417f';
+                elements.documentoLabelText.textContent = 'Documento';
+                elements.documentoIcon.style.color = '#32417f';
+                elements.usernameInput.placeholder = 'Ej: 1465192';
+                elements.submitButtonText.textContent = 'Iniciar Sesión';
+                elements.submitIcon.className = 'fas fa-sign-in-alt mr-2';
+                elements.loadingText.textContent = 'Verificando...';
+                elements.overlayLoadingText.textContent = 'Verificando credenciales...';
+                elements.supportText.textContent = 'Soporte técnico';
+
+                // Update focus ring colors
+                updateFocusColors('#32417f');
+
+            } else if (theme === 'studio') {
+                // Studio Beauty Theme
+                elements.logoImage.src = '../assets/logo-beauty.png';
+                elements.logoImage.alt = 'Logo Studio Beauty';
+                elements.subtitle.textContent = 'Accede a tu academia de belleza';
+                elements.countrySection.style.display = 'none';
+                elements.hiddenCountry.disabled = false;
+                elements.hiddenCountry.value = 'sb';
+                elements.countrySelect.disabled = true;
+                elements.countrySelect.required = false;
+                elements.usernameLabelText.textContent = 'Número de estudiante';
+                elements.usernameIcon.style.color = '#101820';
+                elements.documentoLabelText.textContent = 'Documento de identidad';
+                elements.documentoIcon.style.color = '#101820';
+                elements.usernameInput.placeholder = 'Ej: SB1465192';
+                elements.submitButtonText.textContent = 'Acceder a mi academia';
+                elements.submitIcon.className = 'fas fa-magic mr-2';
+                elements.loadingText.textContent = 'Verificando credenciales...';
+                elements.overlayLoadingText.textContent = 'Accediendo a Studio Beauty...';
+                elements.supportText.textContent = 'Soporte Studio Beauty';
+
+                // Update focus ring colors
+                updateFocusColors('#101820');
+            }
+        }
+
+        function updateFocusColors(color) {
+            const inputs = document.querySelectorAll('.input-field');
+            const submitBtn = document.getElementById('submitBtn');
+
+            inputs.forEach(input => {
+                input.style.setProperty('--focus-color', color);
+            });
+
+            if (submitBtn) {
+                submitBtn.style.setProperty('--focus-color', color);
+            }
+        }
+
+        function setupFormValidation() {
+            const inputs = document.querySelectorAll('input, select');
+
+            inputs.forEach(input => {
+                input.addEventListener('blur', () => validateField(input));
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('border-red-500')) {
+                        validateField(input);
+                    }
+                });
+            });
+
+            // Setup country selector for EDDIS
+            setupCountrySelector();
+        }
+
+        function setupCountrySelector() {
+            const countrySelect = document.getElementById('countrySelect');
+
+            const countries = {
+                ar: { name: 'Argentina', flag: '🇦🇷' },
+                uy: { name: 'Uruguay', flag: '🇺🇾' },
+                py: { name: 'Paraguay', flag: '🇵🇾' },
+            };
+
+            countrySelect.addEventListener('change', (e) => {
+                const selectedCountry = e.target.value;
+
+                if (selectedCountry && countries[selectedCountry]) {
+                    clearFieldError(countrySelect);
+                    updatePlaceholdersByCountry(selectedCountry);
+                }
+            });
+
+            const lastCountry = localStorage.getItem('lastLoginCountry');
+            if (lastCountry && countries[lastCountry]) {
+                countrySelect.value = lastCountry;
+                countrySelect.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function updatePlaceholdersByCountry(country) {
+            const usernameInput = document.getElementById('username');
+            const documentoInput = document.getElementById('documento');
+
+            const placeholders = {
+                ar: { legajo: 'Ej: 1465192', documento: 'Ej: 16639850' },
+                uy: { legajo: 'Ej: UY1465192', documento: 'Ej: 16639850' },
+                py: { legajo: 'Ej: PY1465192', documento: 'Ej: 16639850' },
+            };
+
+            const countryPlaceholders = placeholders[country] || placeholders.ar;
+            usernameInput.placeholder = countryPlaceholders.legajo;
+            documentoInput.placeholder = countryPlaceholders.documento;
+        }
+
+        function validateField(field) {
+            const value = field.value.trim();
+            let isValid = true;
+            let errorMessage = '';
+
+            clearFieldError(field);
+
+            if (field.hasAttribute('required') && !value) {
+                isValid = false;
+                errorMessage = 'Este campo es obligatorio';
+            } else if (field.name === 'username') {
+                if (value.length < 3) {
+                    isValid = false;
+                    errorMessage = 'Debe tener al menos 3 caracteres';
+                } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
+                    isValid = false;
+                    errorMessage = 'Solo se permiten letras y números';
+                }
+            } else if (field.name === 'documento') {
+                if (value.length < 6) {
+                    isValid = false;
+                    errorMessage = 'El documento debe tener al menos 6 dígitos';
+                } else if (!/^[0-9]+$/.test(value)) {
+                    isValid = false;
+                    errorMessage = 'Solo se permiten números';
+                }
+            }
+
+            if (!isValid) {
+                showFieldError(field, errorMessage);
+            } else {
+                showFieldSuccess(field);
+            }
+
+            return isValid;
+        }
+
+        function showFieldError(field, message) {
+            field.classList.add('border-red-500', 'error-shake');
+            field.classList.remove('border-green-500');
+
+            const errorIcon = document.getElementById(field.name + 'Error');
+            const successIcon = document.getElementById(field.name + 'Success');
+
+            if (errorIcon) errorIcon.classList.remove('hidden');
+            if (successIcon) successIcon.classList.add('hidden');
+
+            const errorMsg = document.getElementById(field.name + 'ErrorMsg');
+            if (errorMsg) {
+                errorMsg.querySelector('span').textContent = message;
+                errorMsg.classList.remove('hidden');
+            }
+
+            setTimeout(() => {
+                field.classList.remove('error-shake');
+            }, 500);
+        }
+
+        function showFieldSuccess(field) {
+            field.classList.add('border-green-500');
+            field.classList.remove('border-red-500');
+
+            const successIcon = document.getElementById(field.name + 'Success');
+            const errorIcon = document.getElementById(field.name + 'Error');
+
+            if (successIcon) successIcon.classList.remove('hidden');
+            if (errorIcon) errorIcon.classList.add('hidden');
+
+            const errorMsg = document.getElementById(field.name + 'ErrorMsg');
+            if (errorMsg) errorMsg.classList.add('hidden');
+        }
+
+        function clearFieldError(field) {
+            field.classList.remove('border-red-500', 'border-green-500');
+
+            const errorIcon = document.getElementById(field.name + 'Error');
+            const successIcon = document.getElementById(field.name + 'Success');
+
+            if (errorIcon) errorIcon.classList.add('hidden');
+            if (successIcon) successIcon.classList.add('hidden');
+
+            const errorMsg = document.getElementById(field.name + 'ErrorMsg');
+            if (errorMsg) errorMsg.classList.add('hidden');
+        }
+
+        async function handleUnifiedLogin(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const currentTheme = document.body.className.includes('theme-studio') ? 'studio' : 'eddis';
+
+            // Get required fields based on current theme
+            let requiredFields;
+            if (currentTheme === 'eddis') {
+                requiredFields = form.querySelectorAll('input[required], select[required]');
+            } else {
+                requiredFields = form.querySelectorAll('input[required]:not([disabled])');
+            }
+
+            let isFormValid = true;
+
+            requiredFields.forEach(field => {
+                if (!validateField(field)) {
+                    isFormValid = false;
+                }
+            });
+
+            if (!isFormValid) {
+                showToast('Por favor, corrige los errores en el formulario', 'error');
+                return;
+            }
+
+            setLoadingState(true);
+
+            try {
+                // Set country for Studio Beauty or save selected country for EDDIS
+                if (currentTheme === 'studio') {
+                    localStorage.setItem('entidad', JSON.stringify({ nombre: 'Studio Beauty', codigo: 'sb' }));
+                } else {
+                    const countrySelect = document.getElementById('countrySelect');
+                    const selectedCountryCode = countrySelect.value;
+                    const countries = {
+                        ar: { nombre: 'Argentina', codigo: 'ar' },
+                        uy: { nombre: 'Uruguay', codigo: 'uy' },
+                        py: { nombre: 'Paraguay', codigo: 'py' },
+                    };
+                    if (selectedCountryCode && countries[selectedCountryCode]) {
+                        localStorage.setItem('entidad', JSON.stringify(countries[selectedCountryCode]));
+                    }
+                }
+
+                await handleLogin(event);
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Error inesperado. Inténtalo de nuevo.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function setLoadingState(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoading = document.getElementById('submitLoading');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const form = document.getElementById('loginForm');
+
+            if (!submitBtn) return;
+
+            if (isLoading) {
+                submitBtn.disabled = true;
+                if (submitText) submitText.classList.add('hidden');
+                if (submitLoading) submitLoading.classList.remove('hidden');
+                if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+                if (form) form.classList.add('pointer-events-none');
+            } else {
+                submitBtn.disabled = false;
+                if (submitText) submitText.classList.remove('hidden');
+                if (submitLoading) submitLoading.classList.add('hidden');
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                if (form) form.classList.remove('pointer-events-none');
+            }
+        }
+
+        function focusFirstEmptyField() {
+            const currentTheme = document.body.className.includes('theme-studio') ? 'studio' : 'eddis';
+
+            if (currentTheme === 'eddis') {
+                const countrySelect = document.getElementById('countrySelect');
+                if (!countrySelect.value) {
+                    countrySelect.focus();
+                    return;
+                }
+            }
+
+            const usernameInput = document.getElementById('username');
+            if (!usernameInput.value) {
+                usernameInput.focus();
+                return;
+            }
+
+            const documentoInput = document.getElementById('documento');
+            if (!documentoInput.value) {
+                documentoInput.focus();
+            }
+        }
+
+        function showToast(message, type = 'info', duration = 4000) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            const iconConfig = {
+                success: { icon: 'fas fa-check-circle', class: 'text-green-500' },
+                error: { icon: 'fas fa-exclamation-circle', class: 'text-red-500' },
+                info: { icon: 'fas fa-info-circle', class: 'text-blue-500' },
+                warning: { icon: 'fas fa-exclamation-triangle', class: 'text-yellow-500' }
+            };
+
+            const config = iconConfig[type] || iconConfig.info;
+
+            toastIcon.className = `w-5 h-5 ${config.icon} ${config.class}`;
+            toastMessage.textContent = message;
+
+            toast.classList.remove('translate-x-full');
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, duration);
+        }
+
+        // Make showToast available globally
+        window.showToast = showToast;
+    </script>
+</body>
+
+</html>
