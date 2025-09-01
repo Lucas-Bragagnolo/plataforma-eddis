@@ -608,7 +608,7 @@ function mostrarDetallesCurso(curso) {
             cuentaContainer.innerHTML = '';
             volverBtn.remove();
           };
-          mostrarHistorialCuotasEnPantalla(cuotasFiltradas, curso.textoplan);
+          mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
         }
       };
     }
