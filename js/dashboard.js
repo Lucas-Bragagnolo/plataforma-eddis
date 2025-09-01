@@ -622,10 +622,10 @@ function mostrarDetallesCurso(curso) {
 
       // Obtener todas las cuotas regulares (excluyendo la cuota 99 del derecho de examen)
       const cuotasRegulares = curso.cuotas.filter(c => c.cuota !== '99');
-      
+
       // Verificar que TODAS las cuotas regulares estén pagadas (pagado == '1' o pagado == '2')
       const todasCuotasPagadas = cuotasRegulares.length > 0 && cuotasRegulares.every(c => c.pagado == '1' || c.pagado == '2');
-      
+      console.log(todasCuotasPagadas+"cuotas")
       // Contar cuotas pendientes (pagado == '0')
       const cuotasPendientes = cuotasRegulares.filter(c => c.pagado == '0');
 
@@ -686,8 +686,8 @@ function mostrarDetallesCurso(curso) {
           `;
         } else {
           // Hay cuotas pendientes - mensaje claro y simple
-          const mensajePendientes = cuotasPendientes.length === 1 
-            ? `Tienes 1 cuota pendiente de pago` 
+          const mensajePendientes = cuotasPendientes.length === 1
+            ? `Tienes 1 cuota pendiente de pago`
             : `Tienes ${cuotasPendientes.length} cuotas pendientes de pago`;
 
           mensajeDetalle = `
@@ -716,6 +716,7 @@ function mostrarDetallesCurso(curso) {
 
       // NUEVA LÓGICA DEL BOTÓN DE PAGO DEL DERECHO DE EXAMEN
       if (payExamFeeButton) {
+        console.log('[DERECHO EXAMEN] Botón encontrado:', payExamFeeButton);
         // Condición simple: El examen NO debe estar pagado Y TODAS las cuotas regulares deben estar pagadas
         const puedeAbonarExamen = !examenPagado && todasCuotasPagadas;
 
@@ -729,24 +730,26 @@ function mostrarDetallesCurso(curso) {
         if (puedeAbonarExamen) {
           // Mostrar y habilitar botón
           payExamFeeButton.classList.remove('hidden');
+          payExamFeeButton.style.display = 'block'; // Forzar visualización
           payExamFeeButton.disabled = false;
           payExamFeeButton.innerHTML = '<i class="fa-solid fa-graduation-cap mr-2"></i>Pagar Derecho de Examen';
           payExamFeeButton.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
-          
+          console.log('[DERECHO EXAMEN] Botón mostrado - condiciones cumplidas');
+
           // Configurar evento de click
           payExamFeeButton.onclick = () => {
             const confirmacion = confirm(`¿Confirmas el pago del derecho de examen por $${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}?`);
-            
+
             if (confirmacion) {
               showToast("Redirigiendo al sistema de pagos...", "info");
-              
+
               // Aquí integrarías con tu sistema de pagos real
               console.log('[DERECHO EXAMEN] Iniciando pago:', {
                 cuota: cuotaExamen.cuota,
                 importe: cuotaExamen.importe,
                 mes: cuotaExamen.mes
               });
-              
+
               // Simulación temporal (remover en producción)
               setTimeout(() => {
                 showToast("Pago procesado correctamente", "success");
@@ -756,6 +759,8 @@ function mostrarDetallesCurso(curso) {
         } else {
           // Ocultar botón cuando no se cumplen las condiciones
           payExamFeeButton.classList.add('hidden');
+          payExamFeeButton.style.display = 'none'; // Forzar ocultación
+          console.log('[DERECHO EXAMEN] Botón ocultado - condiciones no cumplidas');
         }
       }
     } else if (examFeeCard) {
