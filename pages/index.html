@@ -158,15 +158,15 @@
                 </div>
               </div>
 
-              <!-- Progress Section -->
+              <!-- Card de Asistencia y Progreso -->
               <div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-gray-200 dark:border-border-dark p-6">
                 <div class="flex items-center justify-between mb-6">
-                  <h4 class="text-lg font-medium text-gray-900 dark:text-text-dark">Progreso del Curso</h4>
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-text-dark">Asistencia y Progreso</h4>
+                  <i class="fa-solid fa-chart-line text-gray-400"></i>
                 </div>
 
-                <!-- Circular Progress Container -->
                 <div class="flex flex-col lg:flex-row items-center gap-8">
-                  <!-- Circular Progress -->
+                  <!-- Progreso Circular -->
                   <div class="flex-shrink-0">
                     <div class="relative w-40 h-40">
                       <!-- Background Circle -->
@@ -182,47 +182,40 @@
                       <!-- Percentage Text -->
                       <div class="absolute inset-0 flex items-center justify-center">
                         <div class="text-center">
-                          <div id="progressPercentage" class="text-4xl font-bold text-gray-900 dark:text-text-dark">0%
-                          </div>
+                          <div id="progressPercentage" class="text-4xl font-bold text-gray-900 dark:text-text-dark">0%</div>
                           <div class="text-xs text-gray-500 dark:text-text-dark-secondary mt-1">Completado</div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Progress Stats -->
+                  <!-- Estadísticas de Asistencia -->
                   <div class="flex-1 w-full">
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <!-- Asistencia -->
                       <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="completedLessons">0</div>
-                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Lecciones Completadas</div>
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <i class="fa-solid fa-calendar-check text-green-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="attendancePercentage">0%</div>
+                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Asistencia</div>
+                        <div class="text-xs text-gray-400 dark:text-gray-dark mt-1">
+                          <span id="attendedClasses">0</span> de <span id="totalClasses">0</span> clases
+                        </div>
                       </div>
+
+                      <!-- Horas de Estudio -->
                       <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="totalLessons">0</div>
-                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Total Lecciones</div>
-                      </div>
-                      <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="studyHours">0</div>
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <i class="fa-solid fa-clock text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="studyHours">0:00</div>
                         <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Horas de Estudio</div>
-                      </div>
-                      <div class="text-center">
-                        <div class="text-2xl font-bold text-gray-900 dark:text-text-dark" id="averageScore">0</div>
-                        <div class="text-sm text-gray-500 dark:text-text-dark-secondary">Promedio</div>
+                        <div class="text-xs text-gray-400 dark:text-gray-dark mt-1">Tiempo total</div>
                       </div>
                     </div>
 
-                    <!-- Progress Details -->
-                    <div class="mt-6 space-y-3">
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Progreso actual</span>
-                        <span id="progressText" class="text-sm font-medium text-primary-darkmode"></span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Tiempo estimado
-                          restante</span>
-                        <span id="estimatedTime" class="text-sm font-medium text-gray-900 dark:text-text-dark">--</span>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -266,7 +259,7 @@
                     class="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center">
                     <i class="fa-solid fa-download text-purple-600 mr-3"></i>
                     <span class="text-sm text-gray-700">Constancia alumno regular</span>
-                </a>
+                  </a>
 
                 </div>
               </div>
@@ -413,11 +406,11 @@
               Cambios</button>
           </form>
         </div>
-            </div>
-          </div>
-        </div>
       </div>
-    </main>
+  </div>
+  </div>
+  </div>
+  </main>
   </div>
 
   <!-- Toast Notification -->

@@ -10,7 +10,7 @@ function mostrarEstadoVacio() {
   //console.log('[DEBUG] Entrando a mostrarEstadoVacio');
   const emptyState = document.getElementById('emptyState');
   const courseDetails = document.getElementById('courseDetails');
-  
+
   if (emptyState && courseDetails) {
     emptyState.classList.remove('hidden');
     courseDetails.classList.add('hidden');
@@ -26,7 +26,7 @@ let paymentsData = []
 // Inicialización del dashboard
 document.addEventListener("DOMContentLoaded", async () => {
   //console.log('[DEBUG] Evento DOMContentLoaded disparado');
-  
+
   if (!checkAuthStatus()) {
     //console.log('[DEBUG] Usuario NO autenticado');
     return;
@@ -37,10 +37,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   displayCurrentCountryInfo();
 
   // Initialize dashboard
-      //console.log('[DEBUG] Iniciando initializeDashboard');
+  //console.log('[DEBUG] Iniciando initializeDashboard');
   await initializeDashboard();
   //console.log('[DEBUG] initializeDashboard completado');
-  
+
   setupEventListeners();
   //console.log('[DEBUG] Event listeners configurados');
 })
@@ -96,7 +96,7 @@ async function initializeDashboard() {
   //console.log('[DEBUG] Entrando a initializeDashboard');
   showTab("tab-cursos-actuales");
   //console.log('[DEBUG] Tab mostrado');
-  
+
   try {
     //console.log('[DEBUG] Llamando a loadUserDataFromAPI');
     await loadUserDataFromAPI();
@@ -113,7 +113,7 @@ async function loadUserDataFromAPI() {
   const entidad = localStorage.getItem('lastLoginCountry');
   const currentCountry = apiService.getCurrentCountry();
   const countryInfo = COUNTRIES[currentCountry];
-  
+
   try {
     //console.log('[DEBUG] Mostrando toast de carga');
     showToast(`Cargando datos desde ${entidad}...`, "info");
@@ -125,7 +125,7 @@ async function loadUserDataFromAPI() {
     if (response.success) {
       // Update global data
       userData = response;
-     // userData.fechaini = response.fechaini;
+      // userData.fechaini = response.fechaini;
       //console.log('[DEBUG] Actualizando datos de usuario:', userData);
       //console.log('[DEBUG] Llamando a poblarSelectorCursos');
       poblarSelectorCursos(response.cursos);
@@ -133,7 +133,7 @@ async function loadUserDataFromAPI() {
 
       updateUserInterface();
       //console.log('[DEBUG] UI actualizada');
-      
+
       showToast(`Datos cargados correctamente`, "success");
     } else {
       //console.error('[ERROR] Respuesta sin success:', response);
@@ -179,7 +179,7 @@ function updateUserData() {
   if (nombreUsuario) {
     if (userData) {
       nombreUsuario.textContent = userData.nombre + " " + userData.apellido;
-        //console.log('[DEBUG] Renderizado en #nombreUsuario:', userData);
+      //console.log('[DEBUG] Renderizado en #nombreUsuario:', userData);
     } else {
       nombreUsuario.textContent = "";
       //console.log('[DEBUG] userData incompleto, no se renderiza nombre');
@@ -356,7 +356,7 @@ function handleLogout() {
 // Evento para traer datos de curso al seleccionar
 const courseSelector = document.getElementById('courseSelector');
 if (courseSelector) {
-  courseSelector.addEventListener('change', async function(e) {
+  courseSelector.addEventListener('change', async function (e) {
     //console.log('[DEBUG] Entrando a evento de cambio de curso');
     const courseId = e.target.value;
     if (!courseId) return;
@@ -385,13 +385,13 @@ if (courseSelector) {
       const params = new URLSearchParams({ pais: apiCountry, token, idcur: courseId }).toString();
       const urlFinal = `/cursos/datos.php?${params}`;
       //  console.log('[DEBUG] URL final:', urlFinal);
-      
+
       // Mostrar loader
       const overlay = document.getElementById('apiOverlay');
       if (overlay) {
         overlay.classList.remove('hidden');
       }
-      
+
       // --- DEBUG FIN ---
       let data;
       try {
@@ -408,7 +408,7 @@ if (courseSelector) {
           overlay.classList.add('hidden');
         }
       }
-      
+
       // Actualizar la UI con los datos completos del curso
       if (data) {
         //console.log('[DEBUG] Llamando a mostrarDetallesCurso');
@@ -428,7 +428,7 @@ if (courseSelector) {
 // Toggle dark mode
 const darkToggleBtn = document.getElementById('toggleDarkMode');
 if (darkToggleBtn) {
-  darkToggleBtn.addEventListener('click', function() {
+  darkToggleBtn.addEventListener('click', function () {
     //  console.log('[DEBUG] Entrando a evento de cambio de modo oscuro');
     document.body.classList.toggle('dark');
     // Guardar preferencia
@@ -453,7 +453,7 @@ function mostrarDetallesCurso(curso) {
   const courseName = document.getElementById('courseName');
   const courseStatus = document.getElementById('courseStatus');
   const courseDates = document.getElementById('courseDates');
-  const progressText = document.getElementById('progressText');
+
   const paymentStatus = document.getElementById('paymentStatus');
   const paymentAmount = document.getElementById('paymentAmount');
   const paymentDue = document.getElementById('paymentDue');
@@ -465,7 +465,6 @@ function mostrarDetallesCurso(curso) {
   const payExamFeeButton = document.getElementById('payExamFeeButton');
   const completedLessons = document.getElementById('completedLessons');
   const totalLessons = document.getElementById('totalLessons');
-  const studyHours = document.getElementById('studyHours');
   const averageScore = document.getElementById('averageScore');
 
 
@@ -475,70 +474,56 @@ function mostrarDetallesCurso(curso) {
 
   // Actualizar detalles del curso
   if (courseName) courseName.textContent = curso.textoplan || 'Curso sin nombre';
-  
+
   // Determinar estado del curso basado en fechabaja y motivobaja
   let estadoCurso = 'Activo';
   let estadoClass = 'bg-green-100 text-green-800';
-  
+
   if (curso.fechabaja && curso.motivobajades) {
     estadoCurso = `Suspendido - ${curso.motivobajades}`;
     estadoClass = 'bg-red-100 text-red-800';
   }
-  
+
   if (courseStatus) {
     courseStatus.textContent = estadoCurso;
     courseStatus.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${estadoClass}`;
   }
-  
+
   if (courseDates) {
     const fechaInicio = curso.fecha || 'No especificada';
     const fechaBaja = curso.fechabaja ? ` - Baja: ${curso.fechabaja}` : '';
     courseDates.textContent = `Inicio: ${fechaInicio}${fechaBaja}`;
   }
-  // Update circular progress
+  // Actualizar progreso circular
   const progressCircle = document.getElementById('progressCircle');
   const progressPercentage = document.getElementById('progressPercentage');
-  const estimatedTime = document.getElementById('estimatedTime');
-  
+
+  // Actualizar card de asistencia
+  const attendancePercentage = document.getElementById('attendancePercentage');
+  const attendedClasses = document.getElementById('attendedClasses');
+  const totalClasses = document.getElementById('totalClasses');
+  const studyHours = document.getElementById('studyHours');
+
+  // Calcular valores
+  const clasesHechas = parseInt(curso.claseshechas) || 0;
+  const clasesTotales = parseInt(curso.clasestotales) || 0;
+  const asistencia = clasesTotales > 0 ? Math.round((clasesHechas / clasesTotales) * 100) : 0;
+  const avance = parseInt(curso.avance) || 0;
+
+  // Actualizar progreso circular
   if (progressCircle && progressPercentage) {
-    const percentage = parseInt(curso.avance) || 0;
     const circumference = 2 * Math.PI * 64; // radius = 64
-    const offset = circumference - (percentage / 100) * circumference;
-    
+    const offset = circumference - (avance / 100) * circumference;
+
     progressCircle.style.strokeDashoffset = offset;
-    progressPercentage.textContent = `${percentage}%`;
+    progressPercentage.textContent = `${avance}%`;
   }
-  
-  if (progressText) {
-    progressText.textContent = `${curso.avance || 0}% completado`;
-  }
-  
-  // Actualizar estadísticas del progreso con datos reales de la API
-  if (completedLessons) {
-    completedLessons.textContent = curso.claseshechas || 0;
-  }
-  if (totalLessons) {
-    totalLessons.textContent = curso.clasestotales || 0;
-  }
-  if (studyHours) {
-    studyHours.textContent = curso.tiempouso || '0:00';
-  }
-  if (averageScore) {
-    // Calcular promedio basado en el avance o usar un valor por defecto
-    const promedio = curso.avance ? Math.round(curso.avance * 0.8 + 20) : 0; // Fórmula simple
-    averageScore.textContent = promedio;
-  }
-  
-  // Calculate estimated time (example calculation)
-  if (estimatedTime) {
-    const remaining = 100 - (parseInt(curso.avance) || 0);
-    const clasesRestantes = (curso.clasestotales || 0) - (curso.claseshechas || 0);
-    if (clasesRestantes > 0) {
-      estimatedTime.textContent = `${clasesRestantes} clases restantes`;
-    } else {
-      estimatedTime.textContent = 'Completado';
-    }
-  }
+
+  // Actualizar elementos de asistencia
+  if (attendancePercentage) attendancePercentage.textContent = `${asistencia}%`;
+  if (attendedClasses) attendedClasses.textContent = clasesHechas;
+  if (totalClasses) totalClasses.textContent = clasesTotales;
+  if (studyHours) studyHours.textContent = curso.tiempouso || '0:00';
 
   // Actualizar estado de cuota regular
   if (curso.cuotas && Array.isArray(curso.cuotas)) {
@@ -546,14 +531,14 @@ function mostrarDetallesCurso(curso) {
     const cuotasRegulares = curso.cuotas.filter(c => c.cuota !== '99');
     const proximaCuotaPendiente = cuotasRegulares.find(c => c.pagado == '0');
     const cuotaMostrar = proximaCuotaPendiente || cuotasRegulares[cuotasRegulares.length - 1];
-    
+
     if (cuotaMostrar && paymentStatus && paymentAmount && paymentDue) {
       const pagada = cuotaMostrar.pagado == '1' || cuotaMostrar.pagado == '2';
-      
+
       // Determinar estado y color
       let estadoTexto = 'Pendiente';
       let estadoClass = 'bg-yellow-100 text-yellow-800';
-      
+
       if (pagada) {
         estadoTexto = cuotaMostrar.pagado == '2' ? 'Pronto Pago' : 'Pagada';
         estadoClass = 'bg-green-100 text-green-800';
@@ -566,16 +551,16 @@ function mostrarDetallesCurso(curso) {
           estadoClass = 'bg-red-100 text-red-800';
         }
       }
-      
+
       paymentStatus.textContent = estadoTexto;
       paymentStatus.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
-      
+
       // Formatear importe
       const importe = parseFloat(cuotaMostrar.importe);
-      paymentAmount.textContent = `$${importe.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-      
+      paymentAmount.textContent = `$${importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+
       paymentDue.textContent = `${cuotaMostrar.mes} - Vence: ${cuotaMostrar.fechaven}`;
-      
+
       // Ocultar botón de pago (se puede implementar más adelante)
       if (payButton) payButton.classList.add('hidden');
       // Botón para ver cuenta corriente
@@ -627,81 +612,210 @@ function mostrarDetallesCurso(curso) {
         }
       };
     }
-    
+
     // Manejar derecho de examen (cuota 99)
     const cuotaExamen = curso.cuotas.find(c => c.cuota === '99');
     if (cuotaExamen && examFeeCard) {
       examFeeCard.classList.remove('hidden');
-      
+
       const examenPagado = cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2';
-      
+
+      // Verificar si todas las cuotas regulares están pagadas
+      const cuotasRegulares = curso.cuotas.filter(c => c.cuota !== '99');
+      const todasCuotasPagadas = cuotasRegulares.every(c => c.pagado == '1' || c.pagado == '2');
+      const cuotasPendientes = cuotasRegulares.filter(c => c.pagado == '0');
+
+      // Verificar cuotas vencidas (no pagadas y con fecha vencida)
+      const hoy = new Date();
+      const cuotasVencidas = cuotasRegulares.filter(c => {
+        if (c.pagado == '0') {
+          const fechaVencimiento = new Date(c.fechaven);
+          return fechaVencimiento < hoy;
+        }
+        return false;
+      });
+
+      // Debug para desarrollo (se puede comentar en producción)
+      console.log('[DEBUG EXAMEN] Estado del derecho de examen:', {
+        cuotasRegulares: cuotasRegulares.length,
+        todasPagadas: todasCuotasPagadas,
+        pendientes: cuotasPendientes.length,
+        vencidas: cuotasVencidas.length,
+        examenPagado: examenPagado
+      });
+
       if (examFeeStatus) {
-        examFeeStatus.textContent = examenPagado ? 'Pagado' : 'Pendiente';
-        examFeeStatus.className = examenPagado 
-          ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800'
-          : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+        let estadoTexto = 'Pendiente';
+        let estadoClass = 'bg-yellow-100 text-yellow-800';
+
+        if (examenPagado) {
+          estadoTexto = cuotaExamen.pagado == '2' ? 'Pagado (Pronto Pago)' : 'Pagado';
+          estadoClass = 'bg-green-100 text-green-800';
+        } else if (todasCuotasPagadas) {
+          estadoTexto = 'Disponible para Pago';
+          estadoClass = 'bg-blue-100 text-blue-800';
+        } else {
+          estadoTexto = 'No Disponible';
+          estadoClass = 'bg-red-100 text-red-800';
+        }
+
+        examFeeStatus.textContent = estadoTexto;
+        examFeeStatus.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
       }
-      
+
       if (examFeeAmount) {
         const importeExamen = parseFloat(cuotaExamen.importe);
-        examFeeAmount.textContent = `$${importeExamen.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+        examFeeAmount.textContent = `$${importeExamen.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
       }
-      
+
       if (examFeeDue) {
-        examFeeDue.textContent = `${cuotaExamen.mes} - Vence: ${cuotaExamen.fechaven}`;
+        let mensajeDetalle = '';
+
+        if (examenPagado) {
+          mensajeDetalle = `
+            <div class="text-xs text-green-600 mt-2">
+              <i class="fa-solid fa-check-circle mr-1"></i>
+              Derecho de examen abonado correctamente
+            </div>
+          `;
+        } else if (todasCuotasPagadas) {
+          mensajeDetalle = `
+            <div class="text-xs text-blue-600 mt-2">
+              <i class="fa-solid fa-info-circle mr-1"></i>
+              ¡Felicitaciones! Ya puedes abonar el derecho de examen
+            </div>
+          `;
+        } else {
+          // Generar mensaje detallado sobre por qué no se puede pagar el derecho de examen
+          let mensajePrincipal = 'Derecho de examen no disponible';
+          let detalleTexto = '';
+          let iconoClase = 'fa-solid fa-lock';
+          let colorClase = 'text-red-600';
+
+          if (cuotasVencidas.length > 0) {
+            // Hay cuotas vencidas - prioridad alta
+            const vencidasTexto = cuotasVencidas.length === 1 ? '1 cuota vencida' : `${cuotasVencidas.length} cuotas vencidas`;
+            detalleTexto = `Tienes ${vencidasTexto}`;
+
+            if (cuotasPendientes.length > cuotasVencidas.length) {
+              const pendientesNoVencidas = cuotasPendientes.length - cuotasVencidas.length;
+              detalleTexto += ` y ${pendientesNoVencidas} cuota${pendientesNoVencidas > 1 ? 's' : ''} pendiente${pendientesNoVencidas > 1 ? 's' : ''}`;
+            }
+
+            mensajePrincipal = 'Cuotas vencidas pendientes';
+            iconoClase = 'fa-solid fa-exclamation-triangle';
+          } else if (cuotasPendientes.length > 0) {
+            // Solo cuotas pendientes (no vencidas)
+            const pendientesTexto = cuotasPendientes.length === 1 ? '1 cuota pendiente' : `${cuotasPendientes.length} cuotas pendientes`;
+            detalleTexto = `Tienes ${pendientesTexto} de pago`;
+            mensajePrincipal = 'Cuotas pendientes de pago';
+            iconoClase = 'fa-solid fa-clock';
+            colorClase = 'text-orange-600';
+          }
+
+          mensajeDetalle = `
+            <div class="text-xs ${colorClase} mt-2">
+              <i class="${iconoClase} mr-1"></i>
+              ${mensajePrincipal}
+              <div class="font-medium mt-1">${detalleTexto}</div>
+              <div class="text-xs mt-2 opacity-75">
+                Debes estar al día con todas las cuotas para poder abonar el derecho de examen
+              </div>
+            </div>
+          `;
+        }
+
+        if (examenPagado || todasCuotasPagadas) {
+          examFeeDue.innerHTML = `
+            <div class="text-xs text-gray-600">
+              ${cuotaExamen.mes} - Vence: ${cuotaExamen.fechaven}
+            </div>
+            ${mensajeDetalle}
+          `;
+        } else {
+          examFeeDue.innerHTML = mensajeDetalle;
+        }
       }
-      
-      // Ocultar botón de pago del examen por ahora
-      if (payExamFeeButton) payExamFeeButton.classList.add('hidden');
+
+      // LÓGICA PRINCIPAL: Mostrar/ocultar botón de pago del derecho de examen
+      if (payExamFeeButton) {
+        // CONDICIONES ESTRICTAS para habilitar el pago del derecho de examen:
+        // 1. El derecho de examen NO debe estar pagado
+        // 2. TODAS las cuotas regulares deben estar pagadas (pagado == '1' o '2')
+        // 3. NO debe haber cuotas pendientes (pagado == '0')
+        // 4. NO debe haber cuotas vencidas (pendientes con fecha vencida)
+        const puedeAbonarExamen = !examenPagado &&
+          todasCuotasPagadas &&
+          cuotasPendientes.length === 0 &&
+          cuotasVencidas.length === 0;
+
+        console.log('[DEBUG EXAMEN] Evaluación para habilitar pago:', {
+          puedeAbonar: puedeAbonarExamen,
+          examenNoPagado: !examenPagado,
+          todasPagadas: todasCuotasPagadas,
+          sinPendientes: cuotasPendientes.length === 0,
+          sinVencidas: cuotasVencidas.length === 0
+        });
+
+        if (puedeAbonarExamen) {
+          // Mostrar botón de pago habilitado
+          payExamFeeButton.classList.remove('hidden');
+          payExamFeeButton.innerHTML = '<i class="fa-solid fa-graduation-cap mr-2"></i>Pagar Derecho de Examen';
+          payExamFeeButton.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+        } else {
+          // Ocultar botón cuando no se cumplen las condiciones
+          payExamFeeButton.classList.add('hidden');
+        }
+      }
     } else if (examFeeCard) {
       examFeeCard.classList.add('hidden');
     }
   }
 
-// Alternar solo cuenta corriente
-function mostrarSoloCuentaCorriente(curso) {
-  // Oculta todo menos el título
-  const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
-  const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
-  if (detalles) detalles.style.display = 'none';
-  if (sidebar) sidebar.style.display = 'none';
-  // Mostrar solo el título y la cuenta corriente
-  const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
-  if (cuentaContainer) {
-    cuentaContainer.innerHTML = '';
-    cuentaContainer.style.display = '';
-    // Botón volver
-    let volverBtn = document.getElementById('volverDatosCursoBtn');
-    if (!volverBtn) {
-      volverBtn = document.createElement('button');
-      volverBtn.id = 'volverDatosCursoBtn';
-      volverBtn.className = 'mb-4 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
-      volverBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i>Volver a los datos del curso';
-      cuentaContainer.parentElement.insertBefore(volverBtn, cuentaContainer);
+  // Alternar solo cuenta corriente
+  function mostrarSoloCuentaCorriente(curso) {
+    // Oculta todo menos el título
+    const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
+    const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
+    if (detalles) detalles.style.display = 'none';
+    if (sidebar) sidebar.style.display = 'none';
+    // Mostrar solo el título y la cuenta corriente
+    const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
+    if (cuentaContainer) {
+      cuentaContainer.innerHTML = '';
+      cuentaContainer.style.display = '';
+      // Botón volver
+      let volverBtn = document.getElementById('volverDatosCursoBtn');
+      if (!volverBtn) {
+        volverBtn = document.createElement('button');
+        volverBtn.id = 'volverDatosCursoBtn';
+        volverBtn.className = 'mb-4 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+        volverBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i>Volver a los datos del curso';
+        cuentaContainer.parentElement.insertBefore(volverBtn, cuentaContainer);
+      }
+      volverBtn.onclick = () => mostrarDatosCompletosCurso(curso);
+      mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
     }
-    volverBtn.onclick = () => mostrarDatosCompletosCurso(curso);
+  }
+
+  function mostrarDatosCompletosCurso(curso) {
+    // Mostrar todos los datos
+    const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
+    const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
+    if (detalles) detalles.style.display = '';
+    if (sidebar) sidebar.style.display = '';
+    // Quitar botón volver
+    let volverBtn = document.getElementById('volverDatosCursoBtn');
+    if (volverBtn) volverBtn.remove();
+    // Limpiar cuenta corriente
     mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
   }
-}
 
-function mostrarDatosCompletosCurso(curso) {
-  // Mostrar todos los datos
-  const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
-  const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
-  if (detalles) detalles.style.display = '';
-  if (sidebar) sidebar.style.display = '';
-  // Quitar botón volver
-  let volverBtn = document.getElementById('volverDatosCursoBtn');
-  if (volverBtn) volverBtn.remove();
-  // Limpiar cuenta corriente
-  mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
-}
-
-// Mostrar historial de cuotas en pantalla
-function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
-  const container = document.getElementById('cuentaCorrienteContainer');
-  if (!container) return;
-  container.innerHTML = `
+  // Mostrar historial de cuotas en pantalla
+  function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
+    const container = document.getElementById('cuentaCorrienteContainer');
+    if (!container) return;
+    container.innerHTML = `
     <div class="bg-white rounded-lg shadow-lg p-2 sm:p-6 mb-6">
       <h3 class="text-xl font-bold mb-4">Cuenta Corriente - ${nombreCurso}</h3>
       <!-- Desktop Table -->
@@ -722,9 +836,9 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
               <tr>
                 <td class="py-1 px-2 border">${c.cuota}</td>
                 <td class="py-1 px-2 border">${c.mes}</td>
-                <td class="py-1 px-2 border">$${parseFloat(c.importe).toLocaleString('es-AR', {minimumFractionDigits:2})}</td>
+                <td class="py-1 px-2 border">$${parseFloat(c.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
                 <td class="py-1 px-2 border">${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</td>
-                <td class="py-1 px-2 border">${c.ppago && c.ppago !== '0.00' ? '$'+parseFloat(c.ppago).toLocaleString('es-AR', {minimumFractionDigits:2}) : '-'}</td>
+                <td class="py-1 px-2 border">${c.ppago && c.ppago !== '0.00' ? '$' + parseFloat(c.ppago).toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '-'}</td>
                 <td class="py-1 px-2 border">${c.fechaven}</td>
               </tr>
             `).join('')}
@@ -737,16 +851,16 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
           <div class="bg-gray-50 rounded-lg p-3 border flex flex-col text-xs">
             <div class="flex justify-between"><span class="font-semibold">Cuota:</span> <span>${c.cuota}</span></div>
             <div class="flex justify-between"><span class="font-semibold">Mes:</span> <span>${c.mes}</span></div>
-            <div class="flex justify-between"><span class="font-semibold">Importe:</span> <span>$${parseFloat(c.importe).toLocaleString('es-AR', {minimumFractionDigits:2})}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Importe:</span> <span>$${parseFloat(c.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span></div>
             <div class="flex justify-between"><span class="font-semibold">Pagado:</span> <span>${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</span></div>
-            <div class="flex justify-between"><span class="font-semibold">Pronto Pago:</span> <span>${c.ppago && c.ppago !== '0.00' ? '$'+parseFloat(c.ppago).toLocaleString('es-AR', {minimumFractionDigits:2}) : '-'}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Pronto Pago:</span> <span>${c.ppago && c.ppago !== '0.00' ? '$' + parseFloat(c.ppago).toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '-'}</span></div>
             <div class="flex justify-between"><span class="font-semibold">Vencimiento:</span> <span>${c.fechaven}</span></div>
           </div>
         `).join('')}
       </div>
     </div>
   `;
-}
+  }
 
   // Configurar enlace de descarga de constancia
   const descargarConstanciaBtn = document.getElementById('descargarConstanciaBtn');
@@ -770,11 +884,11 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
       const pagado = cert.pagado === 1;
       const disponible = cert.disponible === true;
       const notaValida = cert.nota && cert.nota > 0;
-    
+
       const bordeColor = pagado ? 'border-t-4 border-green-500' : 'border-t-4 border-orange-500';
       const iconBg = pagado ? 'bg-green-500' : 'bg-orange-500';
       const iconoEstado = pagado ? '✅' : '⏳';
-    
+
       const botonesHTML = disponible && pagado ? `
         <div class="flex flex-col sm:flex-row gap-2 mt-4">
           <button 
@@ -795,11 +909,11 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
           ${!pagado ? 'Pendiente de pago' : 'No disponible'}
         </div>
       `;
-    
+
       const notaHTML = notaValida
         ? `<span class="inline-block bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">Nota: ${cert.nota}</span>`
         : '';
-    
+
       return `
         <div class="swiper-slide h-full">
           <article class="card h-full flex flex-col justify-between p-4 rounded-lg shadow-md bg-white ${bordeColor}" tabindex="0">
@@ -820,8 +934,8 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
         </div>
       `;
     }
-    
-    
+
+
     // Ordenar: primero Certificado Final, luego el resto
     const certificadosOrdenados = [...curso.certificados].sort((a, b) => {
       if (a.tipo === 'Certificado Final' && b.tipo !== 'Certificado Final') return -1;
@@ -834,7 +948,7 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
       swiperWrapper.innerHTML = certificadosOrdenados
         .map(cert => buildCertificateCard(cert, curso.avance))
         .join('');
-    
+
       // PASO 2: Iniciar Swiper.js después de insertar las cards
       new Swiper('.mySwiper', {
         slidesPerView: 1.2,
@@ -853,7 +967,7 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
         }
       });
     }
-    
+
   }
 
 
@@ -865,38 +979,38 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
       examFeeCard.classList.remove('hidden');
       const examPagada = examCuota.pagado == 1 || examCuota.pagado == 2;
       examFeeStatus.textContent = examPagada ? 'Pagada' : 'Pendiente';
-      examFeeStatus.className = examPagada 
+      examFeeStatus.className = examPagada
         ? 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
         : 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
-      
+
       examFeeAmount.textContent = examCuota.importe;
       examFeeDue.textContent = examCuota.mes;
-      if(!examPagada) {
+      if (!examPagada) {
         payExamFeeButton.classList.remove('hidden');
         payExamFeeButton.onclick = () => pagarCuotaExamen(examCuota);
       } else {
         payExamFeeButton.classList.add('hidden');
       }
-       // Ocultar el botón de pagar para derecho de examen
+      // Ocultar el botón de pagar para derecho de examen
     }
   }
 
   function pagarCuotaExamen(cuota) {
     const confirmacion = confirm(`¿Deseas proceder con el pago del derecho de examen por $${cuota.importe}?`)
-  
+
     if (confirmacion) {
       // Mostrar mensaje de procesamiento
       window.showToast("Redirigiendo al sistema de pagos...", "info")
-  
+
       // Aquí puedes integrar con tu sistema de pagos real
       // Ejemplo: window.location.href = `https://tu-sistema-pagos.com/pagar?cuota=99&monto=${cuota.importe}`;
-  
+
       console.log("[v0] Iniciando pago para cuota 99:", {
         cuota: cuota.cuota,
         importe: cuota.importe,
         mes: cuota.mes,
       })
-  
+
       // Simulación de éxito (remover en producción)
       setTimeout(() => {
         window.showToast("Pago procesado correctamente", "success")
@@ -910,17 +1024,17 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
     const button = event.currentTarget;
     const dropdownMenu = button.nextElementSibling;
     const currentDropdowns = document.querySelectorAll('.dropdown-menu:not(.hidden)');
-    
+
     // Cerrar otros dropdowns abiertos
     currentDropdowns.forEach(menu => {
       if (menu !== dropdownMenu) {
         menu.classList.add('hidden');
       }
     });
-    
+
     // Alternar este dropdown
     dropdownMenu.classList.toggle('hidden');
-    
+
     // Actualizar aria-expanded
     button.setAttribute('aria-expanded', !dropdownMenu.classList.contains('hidden'));
   }
@@ -929,7 +1043,7 @@ function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
   document.addEventListener('click', (event) => {
     const dropdownMenus = document.querySelectorAll('.dropdown-menu');
     const buttons = document.querySelectorAll('[aria-haspopup="true"]');
-    
+
     dropdownMenus.forEach(menu => {
       if (!menu.contains(event.target) && !buttons.contains(event.target)) {
         menu.classList.add('hidden');
@@ -945,7 +1059,7 @@ function poblarSelectorCursos(cursos) {
   //console.log('[DEBUG] Entrando a poblarSelectorCursos');
   const select = document.getElementById('courseSelector');
   //console.log('[DEBUG] Select encontrado:', !!select);
-  
+
   if (!select) {
     console.error('[ERROR] No se encontró el select con id courseSelector');
     console.error('[ERROR] HTML actual del documento:', document.body.innerHTML);
@@ -954,7 +1068,7 @@ function poblarSelectorCursos(cursos) {
 
   //console.log('[DEBUG] Cursos recibidos:', cursos);
   //console.log('[DEBUG] Tipo de cursos:', typeof cursos);
-  
+
   // Verificar si cursos es un objeto y convertirlo a array si es necesario
   if (typeof cursos === 'object' && !Array.isArray(cursos)) {
     //console.log('[DEBUG] Convertir objeto a array');
@@ -963,7 +1077,7 @@ function poblarSelectorCursos(cursos) {
 
   // Opción inicial
   select.innerHTML = '<option value="">Selecciona un curso...</option>';
-  
+
   if (!Array.isArray(cursos)) {
     console.error('[ERROR] El parámetro cursos no es un array:', cursos);
     console.error('[ERROR] Tipo recibido:', typeof cursos);
@@ -975,11 +1089,11 @@ function poblarSelectorCursos(cursos) {
     return;
   }
 
-    //console.log('[DEBUG] Procesando', cursos.length, 'cursos');
-  
+  //console.log('[DEBUG] Procesando', cursos.length, 'cursos');
+
   cursos.forEach((curso, idx) => {
     //console.log(`[DEBUG] Procesando curso [${idx}]:`, curso);
-    
+
     if (!curso || !curso.id || !curso.nombre) {
       console.error('[ERROR] Curso inválido:', curso);
       return;
