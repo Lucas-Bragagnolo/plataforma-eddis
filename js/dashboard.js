@@ -494,15 +494,22 @@ function mostrarDetallesCurso(curso) {
     const fechaBaja = curso.fechabaja ? ` - Baja: ${curso.fechabaja}` : '';
     courseDates.textContent = `Inicio: ${fechaInicio}${fechaBaja}`;
   }
-  // Actualizar progreso circular
+  // Actualizar progreso circular y elementos de la nueva card
   const progressCircle = document.getElementById('progressCircle');
   const progressPercentage = document.getElementById('progressPercentage');
-
-  // Actualizar card de asistencia
+  const progressStatus = document.getElementById('progressStatus');
+  const progressMessage = document.getElementById('progressMessage');
+  
   const attendancePercentage = document.getElementById('attendancePercentage');
   const attendedClasses = document.getElementById('attendedClasses');
   const totalClasses = document.getElementById('totalClasses');
+  const attendanceStatus = document.getElementById('attendanceStatus');
+  const attendanceBar = document.getElementById('attendanceBar');
+  
+  const performanceScore = document.getElementById('performanceScore');
+  const performanceMessage = document.getElementById('performanceMessage');
   const studyHours = document.getElementById('studyHours');
+  const academicTip = document.getElementById('academicTip');
 
   // Calcular valores
   const clasesHechas = parseInt(curso.claseshechas) || 0;
@@ -510,20 +517,134 @@ function mostrarDetallesCurso(curso) {
   const asistencia = clasesTotales > 0 ? Math.round((clasesHechas / clasesTotales) * 100) : 0;
   const avance = parseInt(curso.avance) || 0;
 
-  // Actualizar progreso circular
+  // Actualizar progreso circular con mejor visualización
   if (progressCircle && progressPercentage) {
     const circumference = 2 * Math.PI * 64; // radius = 64
     const offset = circumference - (avance / 100) * circumference;
 
     progressCircle.style.strokeDashoffset = offset;
     progressPercentage.textContent = `${avance}%`;
+    
+    // Cambiar color del círculo según el progreso
+    if (avance >= 80) {
+      progressCircle.className = progressCircle.className.replace('text-blue-600', 'text-green-500');
+    } else if (avance >= 50) {
+      progressCircle.className = progressCircle.className.replace('text-blue-600', 'text-yellow-500');
+    } else {
+      progressCircle.className = progressCircle.className.replace(/text-(green|yellow)-500/, 'text-blue-600');
+    }
   }
 
-  // Actualizar elementos de asistencia
+  // Actualizar estado del progreso
+  if (progressStatus) {
+    if (avance >= 90) {
+      progressStatus.textContent = 'Casi completo';
+      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+    } else if (avance >= 50) {
+      progressStatus.textContent = 'En buen camino';
+      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+    } else if (avance > 0) {
+      progressStatus.textContent = 'En progreso';
+      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
+    } else {
+      progressStatus.textContent = 'Iniciando';
+      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
+    }
+  }
+
+  // Mensaje motivacional del progreso
+  if (progressMessage) {
+    if (avance >= 90) {
+      progressMessage.textContent = '¡Excelente! Ya casi terminas';
+    } else if (avance >= 70) {
+      progressMessage.textContent = '¡Muy bien! Sigue así';
+    } else if (avance >= 40) {
+      progressMessage.textContent = 'Vas por buen camino';
+    } else if (avance > 0) {
+      progressMessage.textContent = 'Continúa con constancia';
+    } else {
+      progressMessage.textContent = 'Comienza tu aprendizaje';
+    }
+  }
+
+  // Actualizar elementos de asistencia con mejor feedback
   if (attendancePercentage) attendancePercentage.textContent = `${asistencia}%`;
   if (attendedClasses) attendedClasses.textContent = clasesHechas;
   if (totalClasses) totalClasses.textContent = clasesTotales;
+  
+  // Actualizar barra de progreso de asistencia
+  if (attendanceBar) {
+    attendanceBar.style.width = `${asistencia}%`;
+    
+    // Cambiar color según el porcentaje
+    if (asistencia >= 90) {
+      attendanceBar.className = 'bg-green-500 h-2 rounded-full transition-all duration-500';
+    } else if (asistencia >= 75) {
+      attendanceBar.className = 'bg-yellow-500 h-2 rounded-full transition-all duration-500';
+    } else {
+      attendanceBar.className = 'bg-red-500 h-2 rounded-full transition-all duration-500';
+    }
+  }
+
+  // Actualizar estado de asistencia
+  if (attendanceStatus) {
+    if (asistencia >= 90) {
+      attendanceStatus.textContent = 'Excelente';
+      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+    } else if (asistencia >= 75) {
+      attendanceStatus.textContent = 'Buena';
+      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+    } else if (asistencia >= 50) {
+      attendanceStatus.textContent = 'Regular';
+      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800';
+    } else {
+      attendanceStatus.textContent = 'Baja';
+      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+    }
+  }
+
+  // Actualizar rendimiento académico
+  if (performanceScore) {
+    // Si hay datos de calificaciones, mostrarlos, sino mostrar el progreso
+    const score = curso.promedio || avance;
+    if (score > 0) {
+      performanceScore.textContent = curso.promedio ? `${score}/10` : `${score}%`;
+    } else {
+      performanceScore.textContent = '--';
+    }
+  }
+
+  // Mensaje de rendimiento
+  if (performanceMessage) {
+    const score = curso.promedio || avance;
+    if (score >= 80) {
+      performanceMessage.textContent = '¡Excelente rendimiento!';
+    } else if (score >= 60) {
+      performanceMessage.textContent = 'Buen rendimiento';
+    } else if (score > 0) {
+      performanceMessage.textContent = 'Puedes mejorar';
+    } else {
+      performanceMessage.textContent = 'Comienza a participar';
+    }
+  }
+
+  // Actualizar tiempo de estudio
   if (studyHours) studyHours.textContent = curso.tiempouso || '0:00';
+
+  // Consejo académico personalizado
+  if (academicTip) {
+    if (asistencia < 75 && avance < 50) {
+      academicTip.textContent = 'Mejora tu asistencia para aprovechar mejor el curso y acelerar tu progreso académico.';
+    } else if (asistencia >= 90 && avance >= 70) {
+      academicTip.textContent = '¡Felicitaciones! Mantienes un excelente ritmo de estudio y asistencia.';
+    } else if (asistencia < 75) {
+      academicTip.textContent = 'Intenta asistir más regularmente para no perderte contenido importante.';
+    } else if (avance < 50) {
+      academicTip.textContent = 'Considera dedicar más tiempo al estudio para acelerar tu progreso.';
+    } else {
+      academicTip.textContent = 'Mantén el equilibrio entre asistencia y estudio para obtener los mejores resultados.';
+    }
+  }
 
   // Actualizar estado de cuota regular
   if (curso.cuotas && Array.isArray(curso.cuotas)) {
@@ -598,18 +719,18 @@ function mostrarDetallesCurso(curso) {
             // Mostrar panel detalle
             if (detalles) detalles.style.display = '';
             if (sidebar) sidebar.style.display = '';
-            
+
             // Buscar y mostrar los paneles de la sidebar
             const estadoCuotaCard = sidebar?.querySelector('.bg-white');
             const examFeeCardElement = document.getElementById('examFeeCard');
-            
+
             // Ocultar completamente el contenedor de cuenta corriente
             cuentaContainer.style.display = 'none';
             cuentaContainer.innerHTML = '';
-            
+
             // Remover el botón
             volverBtn.remove();
-            
+
             console.log('[DEBUG] Volviendo a vista normal del curso');
           };
           mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
@@ -629,7 +750,7 @@ function mostrarDetallesCurso(curso) {
 
       // Verificar que TODAS las cuotas regulares estén pagadas (pagado == '1' o pagado == '2')
       const todasCuotasPagadas = cuotasRegulares.length > 0 && cuotasRegulares.every(c => c.pagado == '1' || c.pagado == '2');
-      console.log(todasCuotasPagadas+"cuotas")
+      console.log(todasCuotasPagadas + "cuotas")
       // Contar cuotas pendientes (pagado == '0')
       const cuotasPendientes = cuotasRegulares.filter(c => c.pagado == '0');
 
@@ -839,7 +960,7 @@ function mostrarDetallesCurso(curso) {
         const hoy = new Date();
         const fechaVencimiento = new Date(cuota.fechaven);
         const estaVencida = fechaVencimiento < hoy;
-        
+
         return {
           texto: estaVencida ? 'Vencida' : 'Pendiente',
           clase: estaVencida ? 'bg-red-100 text-red-800 border-red-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -901,11 +1022,11 @@ function mostrarDetallesCurso(curso) {
           <!-- Vista Desktop: Grid de tarjetas -->
           <div class="hidden sm:grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             ${cuotasRegulares.map(cuota => {
-              const estado = getEstadoCuota(cuota);
-              const importe = parseFloat(cuota.importe);
-              const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
-              
-              return `
+      const estado = getEstadoCuota(cuota);
+      const importe = parseFloat(cuota.importe);
+      const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
+
+      return `
                 <div class="border rounded-lg p-4 ${estado.clase} transition-all duration-200 hover:shadow-md">
                   <!-- Header de la cuota -->
                   <div class="flex items-center justify-between mb-3">
@@ -949,17 +1070,17 @@ function mostrarDetallesCurso(curso) {
                   ` : ''}
                 </div>
               `;
-            }).join('')}
+    }).join('')}
           </div>
 
           <!-- Vista Móvil: Acordeón -->
           <div class="sm:hidden space-y-2">
             ${cuotasRegulares.map((cuota, index) => {
-              const estado = getEstadoCuota(cuota);
-              const importe = parseFloat(cuota.importe);
-              const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
-              
-              return `
+      const estado = getEstadoCuota(cuota);
+      const importe = parseFloat(cuota.importe);
+      const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
+
+      return `
                 <div class="border rounded-lg ${estado.clase} overflow-hidden">
                   <!-- Header clickeable del acordeón -->
                   <button 
@@ -1019,7 +1140,7 @@ function mostrarDetallesCurso(curso) {
                   </div>
                 </div>
               `;
-            }).join('')}
+    }).join('')}
           </div>
 
           <!-- Derecho de Examen (si existe) -->
@@ -1079,11 +1200,11 @@ function mostrarDetallesCurso(curso) {
 
     // Agregar función para manejar el acordeón (solo se ejecuta una vez)
     if (!window.toggleAccordion) {
-      window.toggleAccordion = function(cuotaId) {
+      window.toggleAccordion = function (cuotaId) {
         const content = document.getElementById(cuotaId + '-content');
         const icon = document.getElementById(cuotaId + '-icon');
         const button = content.previousElementSibling;
-        
+
         if (content.style.maxHeight && content.style.maxHeight !== '0px') {
           // Cerrar
           content.style.maxHeight = '0px';
