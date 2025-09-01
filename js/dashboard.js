@@ -494,20 +494,29 @@ function mostrarDetallesCurso(curso) {
     const fechaBaja = curso.fechabaja ? ` - Baja: ${curso.fechabaja}` : '';
     courseDates.textContent = `Inicio: ${fechaInicio}${fechaBaja}`;
   }
-  // Actualizar progreso circular y elementos de la nueva card
+  // Actualizar progreso circular y elementos de la nueva card (Desktop y Mobile)
   const progressCircle = document.getElementById('progressCircle');
   const progressPercentage = document.getElementById('progressPercentage');
   const progressStatus = document.getElementById('progressStatus');
   const progressMessage = document.getElementById('progressMessage');
   
+  // Elementos mobile
+  const progressCircleMobile = document.getElementById('progressCircleMobile');
+  const progressPercentageMobile = document.getElementById('progressPercentageMobile');
+  const progressStatusMobile = document.getElementById('progressStatusMobile');
+
   const attendancePercentage = document.getElementById('attendancePercentage');
   const attendedClasses = document.getElementById('attendedClasses');
   const totalClasses = document.getElementById('totalClasses');
   const attendanceStatus = document.getElementById('attendanceStatus');
   const attendanceBar = document.getElementById('attendanceBar');
   
-  const performanceScore = document.getElementById('performanceScore');
-  const performanceMessage = document.getElementById('performanceMessage');
+  // Elementos mobile de asistencia
+  const attendancePercentageMobile = document.getElementById('attendancePercentageMobile');
+  const attendedClassesMobile = document.getElementById('attendedClassesMobile');
+  const totalClassesMobile = document.getElementById('totalClassesMobile');
+  const attendanceStatusMobile = document.getElementById('attendanceStatusMobile');
+  const attendanceBarMobile = document.getElementById('attendanceBarMobile');
   const studyHours = document.getElementById('studyHours');
   const academicTip = document.getElementById('academicTip');
 
@@ -517,40 +526,67 @@ function mostrarDetallesCurso(curso) {
   const asistencia = clasesTotales > 0 ? Math.round((clasesHechas / clasesTotales) * 100) : 0;
   const avance = parseInt(curso.avance) || 0;
 
-  // Actualizar progreso circular con mejor visualización
+  // Actualizar progreso circular - Desktop
   if (progressCircle && progressPercentage) {
     const circumference = 2 * Math.PI * 64; // radius = 64
     const offset = circumference - (avance / 100) * circumference;
 
     progressCircle.style.strokeDashoffset = offset;
     progressPercentage.textContent = `${avance}%`;
-    
+
     // Cambiar color del círculo según el progreso
+    progressCircle.classList.remove('text-blue-600', 'text-green-500', 'text-yellow-500');
+    
     if (avance >= 80) {
-      progressCircle.className = progressCircle.className.replace('text-blue-600', 'text-green-500');
+      progressCircle.classList.add('text-green-500');
     } else if (avance >= 50) {
-      progressCircle.className = progressCircle.className.replace('text-blue-600', 'text-yellow-500');
+      progressCircle.classList.add('text-yellow-500');
     } else {
-      progressCircle.className = progressCircle.className.replace(/text-(green|yellow)-500/, 'text-blue-600');
+      progressCircle.classList.add('text-blue-600');
     }
   }
 
-  // Actualizar estado del progreso
-  if (progressStatus) {
-    if (avance >= 90) {
-      progressStatus.textContent = 'Casi completo';
-      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+  // Actualizar progreso circular - Mobile
+  if (progressCircleMobile && progressPercentageMobile) {
+    const circumferenceMobile = 2 * Math.PI * 32; // radius = 32
+    const offsetMobile = circumferenceMobile - (avance / 100) * circumferenceMobile;
+
+    progressCircleMobile.style.strokeDashoffset = offsetMobile;
+    progressPercentageMobile.textContent = `${avance}%`;
+    
+    // Cambiar color del círculo según el progreso
+    progressCircleMobile.classList.remove('text-blue-600', 'text-green-500', 'text-yellow-500');
+    
+    if (avance >= 80) {
+      progressCircleMobile.classList.add('text-green-500');
     } else if (avance >= 50) {
-      progressStatus.textContent = 'En buen camino';
-      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
-    } else if (avance > 0) {
-      progressStatus.textContent = 'En progreso';
-      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
+      progressCircleMobile.classList.add('text-yellow-500');
     } else {
-      progressStatus.textContent = 'Iniciando';
-      progressStatus.className = 'px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
+      progressCircleMobile.classList.add('text-blue-600');
     }
   }
+
+  // Actualizar estado del progreso - Desktop y Mobile
+  const updateProgressStatus = (element) => {
+    if (!element) return;
+    
+    if (avance >= 90) {
+      element.textContent = 'Casi completo';
+      element.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+    } else if (avance >= 50) {
+      element.textContent = 'En buen camino';
+      element.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+    } else if (avance > 0) {
+      element.textContent = 'En progreso';
+      element.className = 'px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
+    } else {
+      element.textContent = 'Iniciando';
+      element.className = 'px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
+    }
+  };
+
+  updateProgressStatus(progressStatus);
+  updateProgressStatus(progressStatusMobile);
 
   // Mensaje motivacional del progreso
   if (progressMessage) {
@@ -567,71 +603,60 @@ function mostrarDetallesCurso(curso) {
     }
   }
 
-  // Actualizar elementos de asistencia con mejor feedback
+  // Actualizar elementos de asistencia - Desktop
   if (attendancePercentage) attendancePercentage.textContent = `${asistencia}%`;
   if (attendedClasses) attendedClasses.textContent = clasesHechas;
   if (totalClasses) totalClasses.textContent = clasesTotales;
   
-  // Actualizar barra de progreso de asistencia
-  if (attendanceBar) {
-    attendanceBar.style.width = `${asistencia}%`;
+  // Actualizar elementos de asistencia - Mobile
+  if (attendancePercentageMobile) attendancePercentageMobile.textContent = `${asistencia}%`;
+  if (attendedClassesMobile) attendedClassesMobile.textContent = clasesHechas;
+  if (totalClassesMobile) totalClassesMobile.textContent = clasesTotales;
+  
+  // Función para actualizar barra de asistencia
+  const updateAttendanceBar = (bar, height = 'h-2') => {
+    if (!bar) return;
     
-    // Cambiar color según el porcentaje
+    bar.style.width = `${asistencia}%`;
+    
     if (asistencia >= 90) {
-      attendanceBar.className = 'bg-green-500 h-2 rounded-full transition-all duration-500';
+      bar.className = `bg-green-500 ${height} rounded-full transition-all duration-500`;
     } else if (asistencia >= 75) {
-      attendanceBar.className = 'bg-yellow-500 h-2 rounded-full transition-all duration-500';
+      bar.className = `bg-yellow-500 ${height} rounded-full transition-all duration-500`;
     } else {
-      attendanceBar.className = 'bg-red-500 h-2 rounded-full transition-all duration-500';
+      bar.className = `bg-red-500 ${height} rounded-full transition-all duration-500`;
     }
-  }
+  };
 
-  // Actualizar estado de asistencia
-  if (attendanceStatus) {
+  updateAttendanceBar(attendanceBar, 'h-2');
+  updateAttendanceBar(attendanceBarMobile, 'h-1.5');
+
+  // Función para actualizar estado de asistencia
+  const updateAttendanceStatus = (element) => {
+    if (!element) return;
+    
     if (asistencia >= 90) {
-      attendanceStatus.textContent = 'Excelente';
-      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+      element.textContent = 'Excelente';
+      element.className = 'px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
     } else if (asistencia >= 75) {
-      attendanceStatus.textContent = 'Buena';
-      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+      element.textContent = 'Buena';
+      element.className = 'px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
     } else if (asistencia >= 50) {
-      attendanceStatus.textContent = 'Regular';
-      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800';
+      element.textContent = 'Regular';
+      element.className = 'px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800';
     } else {
-      attendanceStatus.textContent = 'Baja';
-      attendanceStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+      element.textContent = 'Baja';
+      element.className = 'px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
     }
-  }
+  };
 
-  // Actualizar rendimiento académico
-  if (performanceScore) {
-    // Si hay datos de calificaciones, mostrarlos, sino mostrar el progreso
-    const score = curso.promedio || avance;
-    if (score > 0) {
-      performanceScore.textContent = curso.promedio ? `${score}/10` : `${score}%`;
-    } else {
-      performanceScore.textContent = '--';
-    }
-  }
+  updateAttendanceStatus(attendanceStatus);
+  updateAttendanceStatus(attendanceStatusMobile);
 
-  // Mensaje de rendimiento
-  if (performanceMessage) {
-    const score = curso.promedio || avance;
-    if (score >= 80) {
-      performanceMessage.textContent = '¡Excelente rendimiento!';
-    } else if (score >= 60) {
-      performanceMessage.textContent = 'Buen rendimiento';
-    } else if (score > 0) {
-      performanceMessage.textContent = 'Puedes mejorar';
-    } else {
-      performanceMessage.textContent = 'Comienza a participar';
-    }
-  }
+  // Actualizar tiempo de estudio (solo se muestra en desktop en el consejo)
+  const tiempoEstudio = curso.tiempouso || '0:00';
 
-  // Actualizar tiempo de estudio
-  if (studyHours) studyHours.textContent = curso.tiempouso || '0:00';
-
-  // Consejo académico personalizado
+  // Consejo académico personalizado (solo desktop)
   if (academicTip) {
     if (asistencia < 75 && avance < 50) {
       academicTip.textContent = 'Mejora tu asistencia para aprovechar mejor el curso y acelerar tu progreso académico.';
@@ -640,9 +665,9 @@ function mostrarDetallesCurso(curso) {
     } else if (asistencia < 75) {
       academicTip.textContent = 'Intenta asistir más regularmente para no perderte contenido importante.';
     } else if (avance < 50) {
-      academicTip.textContent = 'Considera dedicar más tiempo al estudio para acelerar tu progreso.';
+      academicTip.textContent = 'Dedica más tiempo al estudio para acelerar tu progreso.';
     } else {
-      academicTip.textContent = 'Mantén el equilibrio entre asistencia y estudio para obtener los mejores resultados.';
+      academicTip.textContent = `Vas muy bien. Tiempo de estudio: ${tiempoEstudio}. ¡Sigue así!`;
     }
   }
 
