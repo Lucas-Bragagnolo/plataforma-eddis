@@ -37,7 +37,7 @@
   </script>
 
 </head>
-
+ 
 <body class="flex min-h-screen bg-gray-100">
   <!-- Overlay para móviles -->
   <div id="overlay" class="fixed inset-0 bg-black opacity-50 z-30 hidden md:hidden"></div>
@@ -138,22 +138,39 @@
             <!-- Historial de cuotas responsive -->
             <div class="lg:col-span-3" id="cuentaCorrienteContainer"></div>
             <!-- Main Course Info -->
-            <div class="lg:col-span-2 space-y-2">
-              <!-- Course Header -->
-              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h3 id="courseName" class="text-2xl font-bold text-gray-900 mb-2"></h3>
-                    <div class="flex items-center space-x-4">
-                      <span id="courseStatus"
-                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></span>
-                      <span id="courseDates" class="text-sm text-gray-500"></span>
+            <div class="lg:col-span-2 space-y-4">
+              <!-- Course Header - Simplificado con Constancia -->
+              <div class="course-header-card bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6">
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
+                  <!-- Información del Curso -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start space-x-3">
+                      <!-- Icono del curso -->
+                      <div class="flex-shrink-0">
+                        <div class="course-header-icon w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                          <i class="fa-solid fa-book-open text-white text-lg md:text-xl"></i>
+                        </div>
+                      </div>
+                      
+                      <!-- Detalles del curso -->
+                      <div class="flex-1 min-w-0">
+                        <h3 id="courseName" class="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight"></h3>
+                        
+                        <!-- Status del curso - Visible en mobile y desktop -->
+                        <div class="flex items-center space-x-2">
+                          <span id="courseStatus" class="inline-flex items-center px-2.5 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-medium"></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="flex-shrink-0">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <i class="fa-solid fa-book-open text-blue-600"></i>
-                    </div>
+                  
+                  <!-- Botón Constancia de Alumno Regular - Visible en mobile y desktop -->
+                  <div class="flex justify-center md:justify-end">
+                    <button id="printConstancyBtn" class="course-action-button inline-flex items-center px-3 py-2 md:px-4 md:py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm">
+                      <i class="fa-solid fa-print mr-2"></i>
+                      <span class="hidden md:inline">Constancia de Alumno Regular</span>
+                      <span class="md:hidden">Constancia</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -316,6 +333,107 @@
                 </div>
               </div>
 
+              <!-- Estado de Cuota Mobile - Acordeón -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:hidden">
+                <button id="paymentMobileToggle" class="payment-mobile-accordion w-full flex items-center justify-between text-left focus:outline-none rounded-lg p-2 -m-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                      <i class="fa-solid fa-credit-card text-blue-600 dark:text-blue-300 text-sm"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-base font-medium text-gray-900 dark:text-text-dark">Estado de Cuota</h4>
+                      <p class="text-xs text-gray-500 dark:text-text-dark-secondary" id="paymentMobileStatus">Cargando...</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div id="paymentMobileBadge" class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Ver
+                    </div>
+                    <i id="paymentChevron" class="payment-chevron fa-solid fa-chevron-down text-gray-400"></i>
+                  </div>
+                </button>
+                
+                <!-- Contenido del acordeón -->
+                <div id="paymentMobileContent" class="payment-mobile-content hidden mt-4">
+                  <div class="space-y-3">
+                    <div class="payment-mobile-card bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                      <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Estado:</span>
+                          <span id="paymentStatusMobile" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Monto:</span>
+                          <span id="paymentAmountMobile" class="text-sm font-medium text-gray-900 dark:text-text-dark">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Vencimiento:</span>
+                          <span id="paymentDueMobile" class="text-sm text-gray-900 dark:text-text-dark">-</span>
+                        </div>
+                        <button id="payButtonMobile" class="hidden w-full payment-mobile-button bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg">
+                          <i class="fa-solid fa-credit-card mr-2"></i>
+                          Pagar Cuota
+                        </button>
+                        <button id="verCuentaCorrienteBtnMobile" class="w-full payment-mobile-button bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
+                          <i class="fa-solid fa-list mr-2"></i>
+                          Ver cuenta corriente
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Derecho de Examen Mobile - Acordeón -->
+              <div id="examFeeMobileCard" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:hidden hidden">
+                <button id="examFeeMobileToggle" class="exam-fee-mobile-accordion w-full flex items-center justify-between text-left focus:outline-none rounded-lg p-2 -m-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center">
+                      <i class="fa-solid fa-graduation-cap text-purple-600 dark:text-purple-300 text-sm"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-base font-medium text-gray-900 dark:text-text-dark">Derecho de Examen</h4>
+                      <p class="text-xs text-gray-500 dark:text-text-dark-secondary" id="examFeeMobileStatus">Cargando...</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div id="examFeeMobileBadge" class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Ver
+                    </div>
+                    <i id="examFeeChevron" class="exam-fee-chevron fa-solid fa-chevron-down text-gray-400"></i>
+                  </div>
+                </button>
+                
+                <!-- Contenido del acordeón -->
+                <div id="examFeeMobileContent" class="exam-fee-mobile-content hidden mt-4">
+                  <div class="space-y-3">
+                    <div class="exam-fee-mobile-card bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                      <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Estado:</span>
+                          <span id="examFeeStatusMobile" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Monto:</span>
+                          <span id="examFeeAmountMobile" class="text-sm font-medium text-gray-900 dark:text-text-dark">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-gray-600 dark:text-text-dark-secondary">Vencimiento:</span>
+                          <span id="examFeeDueMobile" class="text-sm text-gray-900 dark:text-text-dark">-</span>
+                        </div>
+                        <div id="examFeeMessageMobile" class="text-sm text-gray-600 dark:text-text-dark-secondary">
+                          <!-- Mensaje dinámico sobre el estado del derecho de examen -->
+                        </div>
+                        <button id="payExamFeeButtonMobile" class="hidden w-full exam-fee-mobile-button bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg">
+                          <i class="fa-solid fa-graduation-cap mr-2"></i>
+                          Pagar Derecho de Examen
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div id="tab-pagos" class="tab-content hidden">
                 <h2 class="text-2xl font-bold mb-6">Historial de Pagos</h2>
                 <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3" id="contenedor-pagos">
@@ -348,20 +466,10 @@
 
             <!-- Sidebar -->
             <div class="space-y-4">
-              <!-- Quick Actions -->
-              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h4 class="text-lg font-medium text-gray-900 mb-4">Acciones Rápidas</h4>
-                <div class="space-y-3">
-                  <a id="descargarConstanciaBtn" target="_blank"
-                    class="w-full text-left px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-center">
-                    <i class="fa-solid fa-download text-purple-600 mr-3"></i>
-                    <span class="text-sm text-gray-700">Constancia alumno regular</span>
-                  </a>
-
-                </div>
-              </div>
+              
+              
               <!-- Payment Status -->
-              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden lg:block">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-lg font-medium text-gray-900">Estado de Cuota</h4>
                   <i class="fa-solid fa-credit-card text-gray-400"></i>
@@ -389,7 +497,7 @@
               </div>
 
               <!-- Exam Fee Status -->
-              <div id="examFeeCard" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden">
+              <div id="examFeeCard" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden lg:block">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-lg font-medium text-gray-900">Derecho de Examen</h4>
                   <i class="fa-solid fa-graduation-cap text-gray-400"></i>

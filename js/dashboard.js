@@ -4,7 +4,7 @@
 import { apiService, ApiError, COUNTRIES } from "./api.js"
 import { showToast, formatDate } from "./utils.js"
 import { checkAuthStatus, logout } from "./auth.js"
-
+ 
 // Mostrar estado vacío cuando no hay datos
 function mostrarEstadoVacio() {
   //console.log('[DEBUG] Entrando a mostrarEstadoVacio');
@@ -344,6 +344,18 @@ function setupEventListeners() {
   if (certificatesMobileToggle) {
     certificatesMobileToggle.addEventListener("click", toggleCertificatesMobile)
   }
+
+  // Acordeón de estado de cuota móvil
+  const paymentMobileToggle = document.getElementById("paymentMobileToggle")
+  if (paymentMobileToggle) {
+    paymentMobileToggle.addEventListener("click", togglePaymentMobile)
+  }
+
+  // Acordeón de derecho de examen móvil
+  const examFeeMobileToggle = document.getElementById("examFeeMobileToggle")
+  if (examFeeMobileToggle) {
+    examFeeMobileToggle.addEventListener("click", toggleExamFeeMobile)
+  }
   
   //console.log('[DEBUG] setupEventListeners completado');
 }
@@ -364,6 +376,46 @@ function handleLogout() {
 function toggleCertificatesMobile() {
   const content = document.getElementById("certificatesMobileContent")
   const chevron = document.getElementById("certificatesChevron")
+  
+  if (!content || !chevron) return
+  
+  const isHidden = content.classList.contains("hidden")
+  
+  if (isHidden) {
+    // Mostrar contenido
+    content.classList.remove("hidden")
+    chevron.classList.add("rotate-180")
+  } else {
+    // Ocultar contenido
+    content.classList.add("hidden")
+    chevron.classList.remove("rotate-180")
+  }
+}
+
+// Toggle acordeón de estado de cuota móvil
+function togglePaymentMobile() {
+  const content = document.getElementById("paymentMobileContent")
+  const chevron = document.getElementById("paymentChevron")
+  
+  if (!content || !chevron) return
+  
+  const isHidden = content.classList.contains("hidden")
+  
+  if (isHidden) {
+    // Mostrar contenido
+    content.classList.remove("hidden")
+    chevron.classList.add("rotate-180")
+  } else {
+    // Ocultar contenido
+    content.classList.add("hidden")
+    chevron.classList.remove("rotate-180")
+  }
+}
+
+// Toggle acordeón de derecho de examen móvil
+function toggleExamFeeMobile() {
+  const content = document.getElementById("examFeeMobileContent")
+  const chevron = document.getElementById("examFeeChevron")
   
   if (!content || !chevron) return
   
@@ -734,6 +786,35 @@ function mostrarDetallesCurso(curso) {
 
       paymentDue.textContent = `${cuotaMostrar.mes} - Vence: ${cuotaMostrar.fechaven}`;
 
+      // Actualizar elementos móviles de estado de cuota
+      const paymentStatusMobile = document.getElementById('paymentStatusMobile');
+      const paymentAmountMobile = document.getElementById('paymentAmountMobile');
+      const paymentDueMobile = document.getElementById('paymentDueMobile');
+      const paymentMobileStatus = document.getElementById('paymentMobileStatus');
+      const paymentMobileBadge = document.getElementById('paymentMobileBadge');
+
+      if (paymentStatusMobile) {
+        paymentStatusMobile.textContent = estadoTexto;
+        paymentStatusMobile.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+      }
+
+      if (paymentAmountMobile) {
+        paymentAmountMobile.textContent = `$${importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+      }
+
+      if (paymentDueMobile) {
+        paymentDueMobile.textContent = `${cuotaMostrar.mes} - ${cuotaMostrar.fechaven}`;
+      }
+
+      if (paymentMobileStatus) {
+        paymentMobileStatus.textContent = `${cuotaMostrar.mes} - ${estadoTexto}`;
+      }
+
+      if (paymentMobileBadge) {
+        paymentMobileBadge.textContent = estadoTexto;
+        paymentMobileBadge.className = `px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+      }
+
       // Ocultar botón de pago (se puede implementar más adelante)
       if (payButton) payButton.classList.add('hidden');
       // Botón para ver cuenta corriente
@@ -788,12 +869,18 @@ function mostrarDetallesCurso(curso) {
           mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
         }
       };
+
+      // Configurar botón móvil de cuenta corriente
+      const verCuentaBtnMobile = document.getElementById('verCuentaCorrienteBtnMobile');
+      if (verCuentaBtnMobile) {
+        verCuentaBtnMobile.onclick = verCuentaBtn.onclick; // Reutilizar la misma funcionalidad
+      }
     }
 
     // Manejar derecho de examen (cuota 99)
     const cuotaExamen = curso.cuotas.find(c => c.cuota === '99');
     if (cuotaExamen && examFeeCard) {
-      examFeeCard.classList.remove('hidden');
+      
 
       const examenPagado = cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2';
 
@@ -837,6 +924,71 @@ function mostrarDetallesCurso(curso) {
 
         examFeeStatus.textContent = estadoTexto;
         examFeeStatus.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+
+        // Actualizar elementos móviles del derecho de examen
+        const examFeeMobileCard = document.getElementById('examFeeMobileCard');
+        const examFeeStatusMobile = document.getElementById('examFeeStatusMobile');
+        const examFeeAmountMobile = document.getElementById('examFeeAmountMobile');
+        const examFeeDueMobile = document.getElementById('examFeeDueMobile');
+        const examFeeMobileStatus = document.getElementById('examFeeMobileStatus');
+        const examFeeMobileBadge = document.getElementById('examFeeMobileBadge');
+        const examFeeMessageMobile = document.getElementById('examFeeMessageMobile');
+
+        // Mostrar la card móvil del derecho de examen
+        if (examFeeMobileCard) {
+          examFeeMobileCard.classList.remove('hidden');
+        }
+
+        if (examFeeStatusMobile) {
+          examFeeStatusMobile.textContent = estadoTexto;
+          examFeeStatusMobile.className = `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+        }
+
+        if (examFeeAmountMobile) {
+          const importeExamen = parseFloat(cuotaExamen.importe);
+          examFeeAmountMobile.textContent = `$${importeExamen.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+        }
+
+        if (examFeeDueMobile) {
+          examFeeDueMobile.textContent = `${cuotaExamen.mes} - ${cuotaExamen.fechaven}`;
+        }
+
+        if (examFeeMobileStatus) {
+          examFeeMobileStatus.textContent = `${cuotaExamen.mes} - ${estadoTexto}`;
+        }
+
+        if (examFeeMobileBadge) {
+          examFeeMobileBadge.textContent = estadoTexto;
+          examFeeMobileBadge.className = `px-2 py-1 rounded-full text-xs font-medium ${estadoClass}`;
+        }
+
+        // Mensaje explicativo móvil
+        if (examFeeMessageMobile) {
+          let mensajeMobile = '';
+          
+          if (examenPagado) {
+            mensajeMobile = '<div class="text-green-600"><i class="fa-solid fa-check-circle mr-1"></i>Derecho de examen abonado correctamente</div>';
+          } else if (todasCuotasPagadas) {
+            mensajeMobile = '<div class="text-blue-600"><i class="fa-solid fa-info-circle mr-1"></i>¡Felicitaciones! Ya puedes abonar el derecho de examen</div>';
+          } else {
+            const mensajePendientes = cuotasPendientes.length === 1
+              ? `Tienes 1 cuota pendiente de pago`
+              : `Tienes ${cuotasPendientes.length} cuotas pendientes de pago`;
+            
+            mensajeMobile = `
+              <div class="text-red-600">
+                <i class="fa-solid fa-lock mr-1"></i>
+                <div class="font-medium">Derecho de examen no disponible</div>
+                <div class="mt-1 text-sm">${mensajePendientes}</div>
+                <div class="text-xs mt-2 opacity-75">
+                  Debes estar al día con todas las cuotas para poder abonar el derecho de examen
+                </div>
+              </div>
+            `;
+          }
+          
+          examFeeMessageMobile.innerHTML = mensajeMobile;
+        }
       }
 
       if (examFeeAmount) {
@@ -914,7 +1066,7 @@ function mostrarDetallesCurso(curso) {
           console.log('[DERECHO EXAMEN] Botón mostrado - condiciones cumplidas');
 
           // Configurar evento de click
-          payExamFeeButton.onclick = () => {
+          const handleExamFeePayment = () => {
             const confirmacion = confirm(`¿Confirmas el pago del derecho de examen por $${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}?`);
 
             if (confirmacion) {
@@ -933,15 +1085,36 @@ function mostrarDetallesCurso(curso) {
               }, 2000);
             }
           };
+
+          payExamFeeButton.onclick = handleExamFeePayment;
+
+          // Configurar botón móvil del derecho de examen
+          const payExamFeeButtonMobile = document.getElementById('payExamFeeButtonMobile');
+          if (payExamFeeButtonMobile) {
+            payExamFeeButtonMobile.classList.remove('hidden');
+            payExamFeeButtonMobile.onclick = handleExamFeePayment;
+          }
         } else {
           // Ocultar botón cuando no se cumplen las condiciones
           payExamFeeButton.classList.add('hidden');
           payExamFeeButton.style.display = 'none'; // Forzar ocultación
           console.log('[DERECHO EXAMEN] Botón ocultado - condiciones no cumplidas');
+
+          // Ocultar botón móvil también
+          const payExamFeeButtonMobile = document.getElementById('payExamFeeButtonMobile');
+          if (payExamFeeButtonMobile) {
+            payExamFeeButtonMobile.classList.add('hidden');
+          }
         }
       }
     } else if (examFeeCard) {
       examFeeCard.classList.add('hidden');
+      
+      // Ocultar también el acordeón móvil del derecho de examen
+      const examFeeMobileCard = document.getElementById('examFeeMobileCard');
+      if (examFeeMobileCard) {
+        examFeeMobileCard.classList.add('hidden');
+      }
     }
   }
 
@@ -1518,7 +1691,7 @@ function mostrarDetallesCurso(curso) {
   if (curso.cuotas && Array.isArray(curso.cuotas)) {
     const examCuota = curso.cuotas.find(c => c.cuota === '99');
     if (examCuota) {
-      examFeeCard.classList.remove('hidden');
+      
       const examPagada = examCuota.pagado == 1 || examCuota.pagado == 2;
       examFeeStatus.textContent = examPagada ? 'Pagada' : 'Pendiente';
       examFeeStatus.className = examPagada

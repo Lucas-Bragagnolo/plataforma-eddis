@@ -76,7 +76,7 @@ const courseDetails = document.getElementById("courseDetails")
 const emptyState = document.getElementById("emptyState")
 const courseName = document.getElementById("courseName")
 const courseStatus = document.getElementById("courseStatus")
-const courseDates = document.getElementById("courseDates")
+const printConstancyBtn = document.getElementById("printConstancyBtn")
 // Removed progressBar - now using circular progress
 const progressText = document.getElementById("progressText")
 const completedLessons = document.getElementById("completedLessons")
@@ -97,6 +97,7 @@ const toastClose = document.getElementById("toastClose")
 courseSelector.addEventListener("change", handleCourseSelection)
 payButton.addEventListener("click", handlePayment)
 toastClose.addEventListener("click", hideToast)
+printConstancyBtn.addEventListener("click", handlePrintConstancy)
 
 // Handle course selection
 function handleCourseSelection(event) {
@@ -127,7 +128,6 @@ function showCourseDetails(course) {
   // Update course information
   courseName.textContent = course.nombre
   updateCourseStatus(course.estado)
-  courseDates.textContent = `${formatDate(course.fechaInicio)} - ${formatDate(course.fechaFin)}`
 
   // Update progress
   updateProgress(course)
@@ -148,8 +148,18 @@ function updateCourseStatus(estado) {
   }
 
   const config = statusConfig[estado] || statusConfig["activo"]
-  courseStatus.textContent = config.text
-  courseStatus.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.class}`
+  
+  // Update desktop status
+  if (courseStatus) {
+    courseStatus.textContent = config.text
+    courseStatus.className = `inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${config.class}`
+  }
+  
+  // Update mobile status
+  if (courseStatusMobile) {
+    courseStatusMobile.textContent = config.text
+    courseStatusMobile.className = `inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${config.class}`
+  }
 }
 
 // Update progress information
@@ -270,6 +280,21 @@ function handleCertificateDownload() {
     // Simulate download
     setTimeout(() => {
       showToast("¡Certificado descargado exitosamente!", "success")
+    }, 1500)
+  }
+}
+
+// Handle constancy print
+function handlePrintConstancy() {
+  const selectedCourseId = courseSelector.value
+  const course = coursesData[selectedCourseId]
+
+  if (course) {
+    showToast(`Imprimiendo constancia de "${course.nombre}"...`, "info")
+
+    // Simulate print
+    setTimeout(() => {
+      showToast("¡Constancia impresa exitosamente!", "success")
     }, 1500)
   }
 }
