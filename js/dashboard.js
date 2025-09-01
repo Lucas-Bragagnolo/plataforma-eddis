@@ -919,15 +919,9 @@ function mostrarDetallesCurso(curso) {
                       <span class="font-medium">${cuota.mes}</span>
                     </div>
                     <div class="flex justify-between">
-                      <span class="text-gray-600">Importe:</span>
-                      <span class="font-bold">$${importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                      <span class="text-gray-600">${cuota.pagado == '2' ? 'Pagó (Pronto Pago):' : 'Importe:'}</span>
+                      <span class="font-bold">$${(cuota.pagado == '2' && prontoPago ? prontoPago : importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    ${prontoPago ? `
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Pronto Pago:</span>
-                      <span class="font-medium text-blue-600">$${prontoPago.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                    ` : ''}
                     <div class="flex justify-between">
                       <span class="text-gray-600">Vencimiento:</span>
                       <span class="font-medium">${cuota.fechaven}</span>
@@ -940,30 +934,38 @@ function mostrarDetallesCurso(curso) {
 
           <!-- Derecho de Examen (si existe) -->
           ${cuotaExamen ? `
-          <div class="mt-6">
-            <h4 class="text-lg font-semibold text-gray-900 mb-3">Derecho de Examen</h4>
-            <div class="border rounded-lg p-4 ${getEstadoCuota(cuotaExamen).clase} max-w-md">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2">
-                  <span class="text-lg font-bold">Cuota 99</span>
-                  <i class="fas ${getEstadoCuota(cuotaExamen).icono}"></i>
+          <div class="mt-8">
+            <h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+              <i class="fas fa-graduation-cap text-purple-600 mr-2"></i>
+              Derecho de Examen
+            </h4>
+            <div class="border-2 border-purple-200 rounded-xl p-5 ${getEstadoCuota(cuotaExamen).clase} max-w-md shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-certificate text-purple-600"></i>
+                  </div>
+                  <div>
+                    <span class="text-lg font-bold text-purple-900">Derecho de Examen</span>
+                    <div class="text-xs text-purple-600">Cuota especial</div>
+                  </div>
                 </div>
-                <span class="px-2 py-1 rounded-full text-xs font-medium ${getEstadoCuota(cuotaExamen).clase}">
+                <span class="px-3 py-1 rounded-full text-xs font-medium ${getEstadoCuota(cuotaExamen).clase} shadow-sm">
                   ${getEstadoCuota(cuotaExamen).texto}
                 </span>
               </div>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Mes:</span>
-                  <span class="font-medium">${cuotaExamen.mes}</span>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-center p-2 bg-white/50 rounded-lg">
+                  <span class="text-gray-700 font-medium">Período:</span>
+                  <span class="font-semibold text-gray-900">${cuotaExamen.mes}</span>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Importe:</span>
-                  <span class="font-bold">$${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                <div class="flex justify-between items-center p-2 bg-white/50 rounded-lg">
+                  <span class="text-gray-700 font-medium">${cuotaExamen.pagado == '2' ? 'Pagó (Pronto Pago):' : 'Importe:'}</span>
+                  <span class="font-bold text-lg text-purple-900">$${(cuotaExamen.pagado == '2' && cuotaExamen.ppago && cuotaExamen.ppago !== '0.00' ? parseFloat(cuotaExamen.ppago) : parseFloat(cuotaExamen.importe)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Vencimiento:</span>
-                  <span class="font-medium">${cuotaExamen.fechaven}</span>
+                <div class="flex justify-between items-center p-2 bg-white/50 rounded-lg">
+                  <span class="text-gray-700 font-medium">Vencimiento:</span>
+                  <span class="font-semibold text-gray-900">${cuotaExamen.fechaven}</span>
                 </div>
               </div>
             </div>
