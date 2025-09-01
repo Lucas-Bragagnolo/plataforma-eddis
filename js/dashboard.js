@@ -807,8 +807,175 @@ function mostrarDetallesCurso(curso) {
     mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
   }
 
-  // Mostrar historial de cuotas en pantalla
+  // Mostrar historial de cuotas en pantalla - VERSIÓN MEJORADA
   function mostrarHistorialCuotasEnPantalla(cuotas, nombreCurso) {
+    const container = document.getElementById('cuentaCorrienteContainer');
+    if (!container) return;
+
+    // Separar cuotas regulares y derecho de examen
+    const cuotasRegulares = cuotas.filter(c => c.cuota !== '99');
+    const cuotaExamen = cuotas.find(c => c.cuota === '99');
+
+    // Función para obtener el estado visual de una cuota
+    function getEstadoCuota(cuota) {
+      if (cuota.pagado == '1') {
+        return {
+          texto: 'Pagada',
+          clase: 'bg-green-100 text-green-800 border-green-200',
+          icono: 'fa-check-circle text-green-600'
+        };
+      } else if (cuota.pagado == '2') {
+        return {
+          texto: 'Pronto Pago',
+          clase: 'bg-blue-100 text-blue-800 border-blue-200',
+          icono: 'fa-clock text-blue-600'
+        };
+      } else {
+        // Verificar si está vencida
+        const hoy = new Date();
+        const fechaVencimiento = new Date(cuota.fechaven);
+        const estaVencida = fechaVencimiento < hoy;
+        
+        return {
+          texto: estaVencida ? 'Vencida' : 'Pendiente',
+          clase: estaVencida ? 'bg-red-100 text-red-800 border-red-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200',
+          icono: estaVencida ? 'fa-exclamation-triangle text-red-600' : 'fa-clock text-yellow-600'
+        };
+      }
+    }
+
+    // Calcular estadísticas
+    const totalCuotas = cuotasRegulares.length;
+    const cuotasPagadas = cuotasRegulares.filter(c => c.pagado == '1' || c.pagado == '2').length;
+    const cuotasPendientes = cuotasRegulares.filter(c => c.pagado == '0').length;
+    const porcentajePagado = totalCuotas > 0 ? Math.round((cuotasPagadas / totalCuotas) * 100) : 0;
+
+    container.innerHTML = `
+      <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6">
+        <!-- Header con estadísticas -->
+        <div class="mb-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Cuenta Corriente - ${nombreCurso}</h3>
+          
+          <!-- Barra de progreso -->
+          <div class="mb-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+              <span>Progreso de pagos</span>
+              <span>${cuotasPagadas}/${totalCuotas} cuotas pagadas (${porcentajePagado}%)</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div class="bg-green-500 h-3 rounded-full transition-all duration-500" style="width: ${porcentajePagado}%"></div>
+            </div>
+          </div>
+
+          <!-- Estadísticas rápidas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            <div class="text-center p-3 bg-gray-50 rounded-lg">
+              <div class="text-2xl font-bold text-gray-900">${totalCuotas}</div>
+              <div class="text-xs text-gray-500">Total Cuotas</div>
+            </div>
+            <div class="text-center p-3 bg-green-50 rounded-lg">
+              <div class="text-2xl font-bold text-green-600">${cuotasPagadas}</div>
+              <div class="text-xs text-gray-500">Pagadas</div>
+            </div>
+            <div class="text-center p-3 bg-yellow-50 rounded-lg">
+              <div class="text-2xl font-bold text-yellow-600">${cuotasPendientes}</div>
+              <div class="text-xs text-gray-500">Pendientes</div>
+            </div>
+            ${cuotaExamen ? `
+            <div class="text-center p-3 bg-purple-50 rounded-lg">
+              <div class="text-2xl font-bold text-purple-600">${cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2' ? '✓' : '○'}</div>
+              <div class="text-xs text-gray-500">Der. Examen</div>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Vista de tarjetas para móvil y desktop -->
+        <div class="space-y-3">
+          <h4 class="text-lg font-semibold text-gray-900 mb-3">Cuotas Regulares</h4>
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            ${cuotasRegulares.map(cuota => {
+              const estado = getEstadoCuota(cuota);
+              const importe = parseFloat(cuota.importe);
+              const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
+              
+              return `
+                <div class="border rounded-lg p-4 ${estado.clase} transition-all duration-200 hover:shadow-md">
+                  <!-- Header de la cuota -->
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-lg font-bold">Cuota ${cuota.cuota}</span>
+                      <i class="fas ${estado.icono}"></i>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium ${estado.clase}">
+                      ${estado.texto}
+                    </span>
+                  </div>
+                  
+                  <!-- Información de la cuota -->
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Mes:</span>
+                      <span class="font-medium">${cuota.mes}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Importe:</span>
+                      <span class="font-bold">$${importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    ${prontoPago ? `
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Pronto Pago:</span>
+                      <span class="font-medium text-blue-600">$${prontoPago.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Vencimiento:</span>
+                      <span class="font-medium">${cuota.fechaven}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Derecho de Examen (si existe) -->
+          ${cuotaExamen ? `
+          <div class="mt-6">
+            <h4 class="text-lg font-semibold text-gray-900 mb-3">Derecho de Examen</h4>
+            <div class="border rounded-lg p-4 ${getEstadoCuota(cuotaExamen).clase} max-w-md">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2">
+                  <span class="text-lg font-bold">Cuota 99</span>
+                  <i class="fas ${getEstadoCuota(cuotaExamen).icono}"></i>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-medium ${getEstadoCuota(cuotaExamen).clase}">
+                  ${getEstadoCuota(cuotaExamen).texto}
+                </span>
+              </div>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Mes:</span>
+                  <span class="font-medium">${cuotaExamen.mes}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Importe:</span>
+                  <span class="font-bold">$${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Vencimiento:</span>
+                  <span class="font-medium">${cuotaExamen.fechaven}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  // Función original (mantenida para compatibilidad)
+  function mostrarHistorialCuotasEnPantallaOriginal(cuotas, nombreCurso) {
     const container = document.getElementById('cuentaCorrienteContainer');
     if (!container) return;
     container.innerHTML = `
