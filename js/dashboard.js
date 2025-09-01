@@ -598,15 +598,19 @@ function mostrarDetallesCurso(curso) {
             // Mostrar panel detalle
             if (detalles) detalles.style.display = '';
             if (sidebar) sidebar.style.display = '';
-            // Volver a mostrar panel Estado de Cuota
-            if (estadoCuotaCard) estadoCuotaCard.style.display = '';
-            // Volver a mostrar panel Derecho de Examen
-            if (derechoExamenCard) derechoExamenCard.style.display = '';
-            // Volver a mostrar panel Acciones Rápidas
-            if (accionesRapidasCard) accionesRapidasCard.style.display = '';
-            // Ocultar cuenta corriente
+            
+            // Buscar y mostrar los paneles de la sidebar
+            const estadoCuotaCard = sidebar?.querySelector('.bg-white');
+            const examFeeCardElement = document.getElementById('examFeeCard');
+            
+            // Ocultar completamente el contenedor de cuenta corriente
+            cuentaContainer.style.display = 'none';
             cuentaContainer.innerHTML = '';
+            
+            // Remover el botón
             volverBtn.remove();
+            
+            console.log('[DEBUG] Volviendo a vista normal del curso');
           };
           mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
         }
@@ -929,6 +933,20 @@ function mostrarDetallesCurso(curso) {
                       <span class="font-medium">${cuota.fechaven}</span>
                     </div>
                   </div>
+                  
+                  <!-- Botón de impresión (solo si está pagada y tiene link de recibo) -->
+                  ${(cuota.pagado == '1' || cuota.pagado == '2') ? `
+                  <div class="mt-3 pt-3 border-t border-black/10">
+                    <button 
+                      onclick="window.open('${cuota.linkRecibo}', '_blank')"
+                      class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200"
+                      title="Imprimir recibo de pago"
+                    >
+                      <i class="fas fa-print"></i>
+                      <span>Imprimir Recibo</span>
+                    </button>
+                  </div>
+                  ` : ''}
                 </div>
               `;
             }).join('')}
@@ -984,6 +1002,18 @@ function mostrarDetallesCurso(curso) {
                           <span class="text-gray-700">Vencimiento:</span>
                           <span class="font-medium">${cuota.fechaven}</span>
                         </div>
+                        
+                        <!-- Botón de impresión móvil (solo si está pagada y tiene link de recibo) -->
+                        ${(cuota.pagado == '1' || cuota.pagado == '2') && cuota.linkRecibo ? `
+                        <button 
+                          onclick="window.open('${cuota.linkRecibo}', '_blank')"
+                          class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200 mt-2"
+                          title="Imprimir recibo de pago"
+                        >
+                          <i class="fas fa-print"></i>
+                          <span>Imprimir Recibo</span>
+                        </button>
+                        ` : ''}
                       </div>
                     </div>
                   </div>
@@ -1027,6 +1057,18 @@ function mostrarDetallesCurso(curso) {
                   <span class="text-gray-700 font-medium">Vencimiento:</span>
                   <span class="font-semibold text-gray-900">${cuotaExamen.fechaven}</span>
                 </div>
+                
+                <!-- Botón de impresión para derecho de examen (solo si está pagado y tiene link de recibo) -->
+                ${(cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2') && cuotaExamen.linkRecibo ? `
+                <button 
+                  onclick="window.open('${cuotaExamen.linkRecibo}', '_blank')"
+                  class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 mt-3 shadow-sm"
+                  title="Imprimir recibo de derecho de examen"
+                >
+                  <i class="fas fa-print"></i>
+                  <span>Imprimir Recibo</span>
+                </button>
+                ` : ''}
               </div>
             </div>
           </div>
