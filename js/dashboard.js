@@ -338,6 +338,13 @@ function setupEventListeners() {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", handleLogout)
   }
+
+  // Acordeón de certificados móvil
+  const certificatesMobileToggle = document.getElementById("certificatesMobileToggle")
+  if (certificatesMobileToggle) {
+    certificatesMobileToggle.addEventListener("click", toggleCertificatesMobile)
+  }
+  
   //console.log('[DEBUG] setupEventListeners completado');
 }
 
@@ -351,6 +358,26 @@ function handleLogout() {
     logout()
   }
   //console.log('[DEBUG] handleLogout completado');
+}
+
+// Toggle acordeón de certificados móvil
+function toggleCertificatesMobile() {
+  const content = document.getElementById("certificatesMobileContent")
+  const chevron = document.getElementById("certificatesChevron")
+  
+  if (!content || !chevron) return
+  
+  const isHidden = content.classList.contains("hidden")
+  
+  if (isHidden) {
+    // Mostrar contenido
+    content.classList.remove("hidden")
+    chevron.classList.add("rotate-180")
+  } else {
+    // Ocultar contenido
+    content.classList.add("hidden")
+    chevron.classList.remove("rotate-180")
+  }
 }
 
 // Evento para traer datos de curso al seleccionar
@@ -499,7 +526,7 @@ function mostrarDetallesCurso(curso) {
   const progressPercentage = document.getElementById('progressPercentage');
   const progressStatus = document.getElementById('progressStatus');
   const progressMessage = document.getElementById('progressMessage');
-  
+
   // Elementos mobile
   const progressCircleMobile = document.getElementById('progressCircleMobile');
   const progressPercentageMobile = document.getElementById('progressPercentageMobile');
@@ -510,7 +537,7 @@ function mostrarDetallesCurso(curso) {
   const totalClasses = document.getElementById('totalClasses');
   const attendanceStatus = document.getElementById('attendanceStatus');
   const attendanceBar = document.getElementById('attendanceBar');
-  
+
   // Elementos mobile de asistencia
   const attendancePercentageMobile = document.getElementById('attendancePercentageMobile');
   const attendedClassesMobile = document.getElementById('attendedClassesMobile');
@@ -536,7 +563,7 @@ function mostrarDetallesCurso(curso) {
 
     // Cambiar color del círculo según el progreso
     progressCircle.classList.remove('text-blue-600', 'text-green-500', 'text-yellow-500');
-    
+
     if (avance >= 80) {
       progressCircle.classList.add('text-green-500');
     } else if (avance >= 50) {
@@ -553,10 +580,10 @@ function mostrarDetallesCurso(curso) {
 
     progressCircleMobile.style.strokeDashoffset = offsetMobile;
     progressPercentageMobile.textContent = `${avance}%`;
-    
+
     // Cambiar color del círculo según el progreso
     progressCircleMobile.classList.remove('text-blue-600', 'text-green-500', 'text-yellow-500');
-    
+
     if (avance >= 80) {
       progressCircleMobile.classList.add('text-green-500');
     } else if (avance >= 50) {
@@ -569,7 +596,7 @@ function mostrarDetallesCurso(curso) {
   // Actualizar estado del progreso - Desktop y Mobile
   const updateProgressStatus = (element) => {
     if (!element) return;
-    
+
     if (avance >= 90) {
       element.textContent = 'Casi completo';
       element.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
@@ -607,18 +634,18 @@ function mostrarDetallesCurso(curso) {
   if (attendancePercentage) attendancePercentage.textContent = `${asistencia}%`;
   if (attendedClasses) attendedClasses.textContent = clasesHechas;
   if (totalClasses) totalClasses.textContent = clasesTotales;
-  
+
   // Actualizar elementos de asistencia - Mobile
   if (attendancePercentageMobile) attendancePercentageMobile.textContent = `${asistencia}%`;
   if (attendedClassesMobile) attendedClassesMobile.textContent = clasesHechas;
   if (totalClassesMobile) totalClassesMobile.textContent = clasesTotales;
-  
+
   // Función para actualizar barra de asistencia
   const updateAttendanceBar = (bar, height = 'h-2') => {
     if (!bar) return;
-    
+
     bar.style.width = `${asistencia}%`;
-    
+
     if (asistencia >= 90) {
       bar.className = `bg-green-500 ${height} rounded-full transition-all duration-500`;
     } else if (asistencia >= 75) {
@@ -634,7 +661,7 @@ function mostrarDetallesCurso(curso) {
   // Función para actualizar estado de asistencia
   const updateAttendanceStatus = (element) => {
     if (!element) return;
-    
+
     if (asistencia >= 90) {
       element.textContent = 'Excelente';
       element.className = 'px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
@@ -1377,6 +1404,7 @@ function mostrarDetallesCurso(curso) {
       return 0;
     });
 
+    // Desktop - Swiper
     const swiperWrapper = document.getElementById('swiper-certificates');
     if (swiperWrapper) {
       swiperWrapper.innerHTML = certificadosOrdenados
@@ -1400,6 +1428,86 @@ function mostrarDetallesCurso(curso) {
           1024: { slidesPerView: 1.5 },
         }
       });
+    }
+
+    // Mobile - Acordeón
+    const certificatesMobileList = document.getElementById('certificatesMobileList');
+    const certificatesCount = document.getElementById('certificatesCount');
+    const certificatesStatus = document.getElementById('certificatesStatus');
+    
+    if (certificatesMobileList && certificatesCount) {
+      // Actualizar contador
+      const totalCertificados = certificadosOrdenados.length;
+      const certificadosDisponibles = certificadosOrdenados.filter(cert => cert.pagado === 1 && cert.disponible === true).length;
+      
+      certificatesCount.textContent = `${certificadosDisponibles} de ${totalCertificados} disponibles`;
+      
+      // Actualizar estado
+      if (certificadosDisponibles > 0) {
+        certificatesStatus.textContent = 'Disponibles';
+        certificatesStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+      } else if (totalCertificados > 0) {
+        certificatesStatus.textContent = 'Pendientes';
+        certificatesStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+      } else {
+        certificatesStatus.textContent = 'Sin certificados';
+        certificatesStatus.className = 'px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800';
+      }
+      
+      // Generar lista móvil
+      certificatesMobileList.innerHTML = certificadosOrdenados.map(cert => {
+        const pagado = cert.pagado === 1;
+        const disponible = cert.disponible === true;
+        const notaValida = cert.nota && cert.nota > 0;
+        
+        const statusIcon = pagado ? '✅' : '⏳';
+        const statusText = pagado ? 'Disponible' : 'Pendiente de pago';
+        const statusClass = pagado ? 'text-green-600' : 'text-yellow-600';
+        
+        const botonesHTML = disponible && pagado ? `
+          <div class="flex space-x-2 mt-3">
+            <button 
+              class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              onclick="window.open('${cert.linkcertificado}', '_blank')"
+              aria-label="Imprimir certificado de ${cert.titulo}">
+              <i class="fa-solid fa-print text-sm"></i>
+              <span>Certificado</span>
+            </button>
+            <button 
+              class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-gray-700 hover:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
+              onclick="window.open('${cert.linkcredencial}', '_blank')"
+              aria-label="Imprimir credencial de ${cert.titulo}">
+              <i class="fa-solid fa-id-card text-sm"></i>
+              <span>Credencial</span>
+            </button>
+          </div>
+        ` : `
+          <div class="mt-3 text-sm font-medium ${statusClass}">
+            ${statusText}
+          </div>
+        `;
+        
+        const notaHTML = notaValida
+          ? `<div class="mt-2"><span class="certificate-grade-badge">Nota: ${cert.nota}</span></div>`
+          : '';
+        
+        const cardClass = pagado ? 'certificate-available' : 'certificate-pending';
+        
+        return `
+          <div class="certificate-mobile-card bg-gray-50 dark:bg-gray-800 rounded-lg p-3 ${cardClass}">
+            <div class="flex items-start space-x-3">
+              <div class="certificate-status-icon flex-shrink-0">${statusIcon}</div>
+              <div class="flex-1 min-w-0">
+                <h5 class="text-sm font-medium text-gray-900 dark:text-text-dark truncate">${cert.titulo}</h5>
+                <p class="text-xs text-gray-500 dark:text-text-dark-secondary mt-1">${cert.tipo}</p>
+                ${notaHTML}
+                <div class="text-xs ${statusClass} mt-1 font-medium">${statusText}</div>
+                ${botonesHTML}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
   }

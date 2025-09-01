@@ -287,6 +287,35 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Certificados Mobile - Acordeón -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:hidden">
+                <button id="certificatesMobileToggle" class="certificates-mobile-accordion w-full flex items-center justify-between text-left focus:outline-none rounded-lg p-2 -m-2">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center">
+                      <i class="fa-solid fa-award text-yellow-600 dark:text-yellow-300 text-sm"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-base font-medium text-gray-900 dark:text-text-dark">Certificados</h4>
+                      <p class="text-xs text-gray-500 dark:text-text-dark-secondary" id="certificatesCount">0 disponibles</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div id="certificatesStatus" class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Ver
+                    </div>
+                    <i id="certificatesChevron" class="certificates-chevron fa-solid fa-chevron-down text-gray-400"></i>
+                  </div>
+                </button>
+                
+                <!-- Contenido del acordeón -->
+                <div id="certificatesMobileContent" class="certificates-mobile-content hidden mt-4">
+                  <div id="certificatesMobileList" class="space-y-3">
+                    <!-- Los certificados se cargarán aquí dinámicamente -->
+                  </div>
+                </div>
+              </div>
+
               <div id="tab-pagos" class="tab-content hidden">
                 <h2 class="text-2xl font-bold mb-6">Historial de Pagos</h2>
                 <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3" id="contenedor-pagos">

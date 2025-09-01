@@ -489,4 +489,134 @@ ilos mejorados para la card de progreso académico */
   .mobile-attendance-bar {
     transition: width 0.8s ease-out, background-color 0.3s ease;
   }
+}/* Estilos 
+para el acordeón de certificados móvil */
+.certificates-mobile-accordion {
+  transition: all 0.3s ease;
+}
+
+.certificates-mobile-accordion:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark .certificates-mobile-accordion:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Animación del chevron */
+.certificates-chevron {
+  transition: transform 0.2s ease;
+}
+
+.certificates-chevron.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Contenido del acordeón */
+.certificates-mobile-content {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cards de certificados móvil */
+.certificate-mobile-card {
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.certificate-mobile-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dark .certificate-mobile-card {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.dark .certificate-mobile-card:hover {
+  border-color: #6b7280;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Botones de certificados móvil */
+.certificate-mobile-button {
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.certificate-mobile-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.certificate-mobile-button:active {
+  transform: translateY(0);
+}
+
+/* Iconos de estado en certificados móvil */
+.certificate-status-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+/* Badge de nota */
+.certificate-grade-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .certificate-mobile-button {
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.5rem;
+  }
+  
+  .certificate-mobile-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Estados de certificados */
+.certificate-available {
+  border-left: 3px solid #10b981;
+}
+
+.certificate-pending {
+  border-left: 3px solid #f59e0b;
+}
+
+.certificate-unavailable {
+  border-left: 3px solid #ef4444;
+}
+
+/* Animación de carga para certificados */
+.certificates-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
