@@ -893,7 +893,9 @@ function mostrarDetallesCurso(curso) {
         <!-- Vista de tarjetas para móvil y desktop -->
         <div class="space-y-3">
           <h4 class="text-lg font-semibold text-gray-900 mb-3">Cuotas Regulares</h4>
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          
+          <!-- Vista Desktop: Grid de tarjetas -->
+          <div class="hidden sm:grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             ${cuotasRegulares.map(cuota => {
               const estado = getEstadoCuota(cuota);
               const importe = parseFloat(cuota.importe);
@@ -925,6 +927,64 @@ function mostrarDetallesCurso(curso) {
                     <div class="flex justify-between">
                       <span class="text-gray-600">Vencimiento:</span>
                       <span class="font-medium">${cuota.fechaven}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Vista Móvil: Acordeón -->
+          <div class="sm:hidden space-y-2">
+            ${cuotasRegulares.map((cuota, index) => {
+              const estado = getEstadoCuota(cuota);
+              const importe = parseFloat(cuota.importe);
+              const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
+              
+              return `
+                <div class="border rounded-lg ${estado.clase} overflow-hidden">
+                  <!-- Header clickeable del acordeón -->
+                  <button 
+                    class="w-full p-3 text-left flex items-center justify-between hover:bg-black/5 transition-colors duration-200"
+                    onclick="toggleAccordion('cuota-${cuota.cuota}')"
+                    aria-expanded="false"
+                    aria-controls="cuota-${cuota.cuota}-content"
+                  >
+                    <div class="flex items-center space-x-3">
+                      <i class="fas ${estado.icono}"></i>
+                      <div>
+                        <span class="font-bold text-sm">Cuota ${cuota.cuota}</span>
+                        <div class="text-xs text-gray-600">${cuota.mes}</div>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class="px-2 py-1 rounded-full text-xs font-medium ${estado.clase}">
+                        ${estado.texto}
+                      </span>
+                      <i class="fas fa-chevron-down transition-transform duration-200" id="cuota-${cuota.cuota}-icon"></i>
+                    </div>
+                  </button>
+                  
+                  <!-- Contenido colapsable -->
+                  <div 
+                    id="cuota-${cuota.cuota}-content" 
+                    class="accordion-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out"
+                  >
+                    <div class="p-3 pt-0 border-t border-black/10">
+                      <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center p-2 bg-white/30 rounded">
+                          <span class="text-gray-700">Mes:</span>
+                          <span class="font-medium">${cuota.mes}</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white/30 rounded">
+                          <span class="text-gray-700">${cuota.pagado == '2' ? 'Pagó (Pronto Pago):' : 'Importe:'}</span>
+                          <span class="font-bold">$${(cuota.pagado == '2' && prontoPago ? prontoPago : importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white/30 rounded">
+                          <span class="text-gray-700">Vencimiento:</span>
+                          <span class="font-medium">${cuota.fechaven}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -974,6 +1034,27 @@ function mostrarDetallesCurso(curso) {
         </div>
       </div>
     `;
+
+    // Agregar función para manejar el acordeón (solo se ejecuta una vez)
+    if (!window.toggleAccordion) {
+      window.toggleAccordion = function(cuotaId) {
+        const content = document.getElementById(cuotaId + '-content');
+        const icon = document.getElementById(cuotaId + '-icon');
+        const button = content.previousElementSibling;
+        
+        if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+          // Cerrar
+          content.style.maxHeight = '0px';
+          icon.style.transform = 'rotate(0deg)';
+          button.setAttribute('aria-expanded', 'false');
+        } else {
+          // Abrir
+          content.style.maxHeight = content.scrollHeight + 'px';
+          icon.style.transform = 'rotate(180deg)';
+          button.setAttribute('aria-expanded', 'true');
+        }
+      };
+    }
   }
 
   // Función original (mantenida para compatibilidad)
