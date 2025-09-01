@@ -2,7 +2,7 @@
 
 //console.log('[DEBUG] Dashboard.js cargado');
 import { apiService, ApiError, COUNTRIES } from "./api.js"
-import { showToast, formatDate } from "./utils.js"
+import { showToast, formatDate, formatDateShort } from "./utils.js"
 import { checkAuthStatus, logout } from "./auth.js"
  
 // Mostrar estado vacío cuando no hay datos
@@ -569,8 +569,8 @@ function mostrarDetallesCurso(curso) {
   }
 
   if (courseDates) {
-    const fechaInicio = curso.fecha || 'No especificada';
-    const fechaBaja = curso.fechabaja ? ` - Baja: ${curso.fechabaja}` : '';
+    const fechaInicio = curso.fecha ? formatDate(curso.fecha) : 'No especificada';
+    const fechaBaja = curso.fechabaja ? ` - Baja: ${formatDate(curso.fechabaja)}` : '';
     courseDates.textContent = `Inicio: ${fechaInicio}${fechaBaja}`;
   }
   // Actualizar progreso circular y elementos de la nueva card (Desktop y Mobile)
@@ -784,7 +784,7 @@ function mostrarDetallesCurso(curso) {
       const importe = parseFloat(cuotaMostrar.importe);
       paymentAmount.textContent = `$${importe.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 
-      paymentDue.textContent = `${cuotaMostrar.mes} - Vence: ${cuotaMostrar.fechaven}`;
+      paymentDue.textContent = `${cuotaMostrar.mes} - Vence: ${formatDate(cuotaMostrar.fechaven)}`;
 
       // Actualizar elementos móviles de estado de cuota
       const paymentStatusMobile = document.getElementById('paymentStatusMobile');
@@ -803,7 +803,7 @@ function mostrarDetallesCurso(curso) {
       }
 
       if (paymentDueMobile) {
-        paymentDueMobile.textContent = `${cuotaMostrar.mes} - ${cuotaMostrar.fechaven}`;
+        paymentDueMobile.textContent = `${cuotaMostrar.mes} - ${formatDate(cuotaMostrar.fechaven)}`;
       }
 
       if (paymentMobileStatus) {
@@ -950,7 +950,7 @@ function mostrarDetallesCurso(curso) {
         }
 
         if (examFeeDueMobile) {
-          examFeeDueMobile.textContent = `${cuotaExamen.mes} - ${cuotaExamen.fechaven}`;
+          examFeeDueMobile.textContent = `${cuotaExamen.mes} - ${formatDate(cuotaExamen.fechaven)}`;
         }
 
         if (examFeeMobileStatus) {
@@ -1034,7 +1034,7 @@ function mostrarDetallesCurso(curso) {
         if (examenPagado || todasCuotasPagadas) {
           examFeeDue.innerHTML = `
             <div class="text-xs text-gray-600">
-              ${cuotaExamen.mes} - Vence: ${cuotaExamen.fechaven}
+              ${cuotaExamen.mes} - Vence: ${formatDate(cuotaExamen.fechaven)}
             </div>
             ${mensajeDetalle}
           `;
@@ -1276,7 +1276,7 @@ function mostrarDetallesCurso(curso) {
                     </div>
                     <div class="flex justify-between">
                       <span class="text-gray-600">Vencimiento:</span>
-                      <span class="font-medium">${cuota.fechaven}</span>
+                      <span class="font-medium">${formatDate(cuota.fechaven)}</span>
                     </div>
                   </div>
                   
@@ -1346,7 +1346,7 @@ function mostrarDetallesCurso(curso) {
                         </div>
                         <div class="flex justify-between items-center p-2 bg-white/30 rounded">
                           <span class="text-gray-700">Vencimiento:</span>
-                          <span class="font-medium">${cuota.fechaven}</span>
+                          <span class="font-medium">${formatDate(cuota.fechaven)}</span>
                         </div>
                         
                         <!-- Botón de impresión móvil (solo si está pagada y tiene link de recibo) -->
@@ -1401,7 +1401,7 @@ function mostrarDetallesCurso(curso) {
                 </div>
                 <div class="flex justify-between items-center p-2 bg-white/50 rounded-lg">
                   <span class="text-gray-700 font-medium">Vencimiento:</span>
-                  <span class="font-semibold text-gray-900">${cuotaExamen.fechaven}</span>
+                  <span class="font-semibold text-gray-900">${formatDate(cuotaExamen.fechaven)}</span>
                 </div>
                 
                 <!-- Botón de impresión para derecho de examen (solo si está pagado y tiene link de recibo) -->
@@ -1473,7 +1473,7 @@ function mostrarDetallesCurso(curso) {
                 <td class="py-1 px-2 border">$${parseFloat(c.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
                 <td class="py-1 px-2 border">${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</td>
                 <td class="py-1 px-2 border">${c.ppago && c.ppago !== '0.00' ? '$' + parseFloat(c.ppago).toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '-'}</td>
-                <td class="py-1 px-2 border">${c.fechaven}</td>
+                <td class="py-1 px-2 border">${formatDate(c.fechaven)}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -1488,7 +1488,7 @@ function mostrarDetallesCurso(curso) {
             <div class="flex justify-between"><span class="font-semibold">Importe:</span> <span>$${parseFloat(c.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span></div>
             <div class="flex justify-between"><span class="font-semibold">Pagado:</span> <span>${c.pagado == 1 ? 'Sí' : (c.pagado == 2 ? 'Pronto Pago' : 'No')}</span></div>
             <div class="flex justify-between"><span class="font-semibold">Pronto Pago:</span> <span>${c.ppago && c.ppago !== '0.00' ? '$' + parseFloat(c.ppago).toLocaleString('es-AR', { minimumFractionDigits: 2 }) : '-'}</span></div>
-            <div class="flex justify-between"><span class="font-semibold">Vencimiento:</span> <span>${c.fechaven}</span></div>
+            <div class="flex justify-between"><span class="font-semibold">Vencimiento:</span> <span>${formatDate(c.fechaven)}</span></div>
           </div>
         `).join('')}
       </div>

@@ -182,12 +182,103 @@ export function isValidEmail(email) {
 
 // Format date with better localization
 export function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  if (!dateString) return "No especificada"
+  
+  try {
+    const date = luxon.DateTime.fromISO(dateString)
+    
+    if (!date.isValid) {
+      // Fallback para fechas en formato no ISO
+      const fallbackDate = new Date(dateString)
+      if (isNaN(fallbackDate.getTime())) {
+        return "Fecha inválida"
+      }
+      return fallbackDate.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit", 
+        year: "numeric"
+      })
+    }
+    
+    return date.toFormat("dd/MM/yyyy")
+  } catch (error) {
+    // Fallback si Luxon no está disponible
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return "Fecha inválida"
+    }
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    })
+  }
+}
+
+// Format date for short display (dd/mm/aa)
+export function formatDateShort(dateString) {
+  if (!dateString) return "No especificada"
+  
+  try {
+    const date = luxon.DateTime.fromISO(dateString)
+    
+    if (!date.isValid) {
+      const fallbackDate = new Date(dateString)
+      if (isNaN(fallbackDate.getTime())) {
+        return "Fecha inválida"
+      }
+      return fallbackDate.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit"
+      })
+    }
+    
+    return date.toFormat("dd/MM/yy")
+  } catch (error) {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return "Fecha inválida"
+    }
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit"
+    })
+  }
+}
+
+// Format date for long display (dd de mes de yyyy)
+export function formatDateLong(dateString) {
+  if (!dateString) return "No especificada"
+  
+  try {
+    const date = luxon.DateTime.fromISO(dateString)
+    
+    if (!date.isValid) {
+      const fallbackDate = new Date(dateString)
+      if (isNaN(fallbackDate.getTime())) {
+        return "Fecha inválida"
+      }
+      return fallbackDate.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      })
+    }
+    
+    return date.toFormat("dd 'de' MMMM 'de' yyyy", { locale: "es" })
+  } catch (error) {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      return "Fecha inválida"
+    }
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    })
+  }
 }
 
 // Redirect with loading state

@@ -15,7 +15,7 @@ const coursesData = {
     horasEstudio: 45,
     promedio: 87,
     montoMatricula: "$299",
-    fechaVencimiento: "15 Feb 2024",
+    fechaVencimiento: "2024-02-15",
   },
   2: {
     id: "2",
@@ -49,7 +49,7 @@ const coursesData = {
     horasEstudio: 28,
     promedio: 78,
     montoMatricula: "$399",
-    fechaVencimiento: "28 Feb 2024",
+    fechaVencimiento: "2024-02-28",
   },
   4: {
     id: "4",
@@ -66,7 +66,7 @@ const coursesData = {
     horasEstudio: 12,
     promedio: 65,
     montoMatricula: "$349",
-    fechaVencimiento: "10 Feb 2024 (Vencida)",
+    fechaVencimiento: "2024-02-10",
   },
 }
 
@@ -326,12 +326,37 @@ export function showToast(message, type = "info") {
 }
 
 export function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  if (!dateString || dateString === "Pagado") return dateString;
+  
+  try {
+    const date = luxon.DateTime.fromISO(dateString);
+    
+    if (!date.isValid) {
+      // Fallback para fechas en formato no ISO
+      const fallbackDate = new Date(dateString);
+      if (isNaN(fallbackDate.getTime())) {
+        return "Fecha inválida";
+      }
+      return fallbackDate.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+    
+    return date.toFormat("dd/MM/yyyy");
+  } catch (error) {
+    // Fallback si Luxon no está disponible
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return "Fecha inválida";
+    }
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  }
 }
 
 // Hide toast notification
