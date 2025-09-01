@@ -620,28 +620,27 @@ function mostrarDetallesCurso(curso) {
 
       const examenPagado = cuotaExamen.pagado == '1' || cuotaExamen.pagado == '2';
 
-      // Verificar si todas las cuotas regulares están pagadas
+      // Obtener todas las cuotas regulares (excluyendo la cuota 99 del derecho de examen)
       const cuotasRegulares = curso.cuotas.filter(c => c.cuota !== '99');
-      const todasCuotasPagadas = cuotasRegulares.every(c => c.pagado == '1' || c.pagado == '2');
+      
+      // Verificar que TODAS las cuotas regulares estén pagadas (pagado == '1' o pagado == '2')
+      const todasCuotasPagadas = cuotasRegulares.length > 0 && cuotasRegulares.every(c => c.pagado == '1' || c.pagado == '2');
+      
+      // Contar cuotas pendientes (pagado == '0')
       const cuotasPendientes = cuotasRegulares.filter(c => c.pagado == '0');
 
-      // Verificar cuotas vencidas (no pagadas y con fecha vencida)
-      const hoy = new Date();
-      const cuotasVencidas = cuotasRegulares.filter(c => {
-        if (c.pagado == '0') {
-          const fechaVencimiento = new Date(c.fechaven);
-          return fechaVencimiento < hoy;
-        }
-        return false;
-      });
-
-      // Debug para desarrollo (se puede comentar en producción)
-      console.log('[DEBUG EXAMEN] Estado del derecho de examen:', {
-        cuotasRegulares: cuotasRegulares.length,
-        todasPagadas: todasCuotasPagadas,
-        pendientes: cuotasPendientes.length,
-        vencidas: cuotasVencidas.length,
-        examenPagado: examenPagado
+      // Debug para desarrollo
+      console.log('[DERECHO EXAMEN] Estado actual:', {
+        totalCuotasRegulares: cuotasRegulares.length,
+        cuotasPendientes: cuotasPendientes.length,
+        todasCuotasPagadas: todasCuotasPagadas,
+        examenPagado: examenPagado,
+        detallesCuotas: cuotasRegulares.map(c => ({
+          cuota: c.cuota,
+          mes: c.mes,
+          pagado: c.pagado,
+          importe: c.importe
+        }))
       });
 
       if (examFeeStatus) {
@@ -686,38 +685,16 @@ function mostrarDetallesCurso(curso) {
             </div>
           `;
         } else {
-          // Generar mensaje detallado sobre por qué no se puede pagar el derecho de examen
-          let mensajePrincipal = 'Derecho de examen no disponible';
-          let detalleTexto = '';
-          let iconoClase = 'fa-solid fa-lock';
-          let colorClase = 'text-red-600';
-
-          if (cuotasVencidas.length > 0) {
-            // Hay cuotas vencidas - prioridad alta
-            const vencidasTexto = cuotasVencidas.length === 1 ? '1 cuota vencida' : `${cuotasVencidas.length} cuotas vencidas`;
-            detalleTexto = `Tienes ${vencidasTexto}`;
-
-            if (cuotasPendientes.length > cuotasVencidas.length) {
-              const pendientesNoVencidas = cuotasPendientes.length - cuotasVencidas.length;
-              detalleTexto += ` y ${pendientesNoVencidas} cuota${pendientesNoVencidas > 1 ? 's' : ''} pendiente${pendientesNoVencidas > 1 ? 's' : ''}`;
-            }
-
-            mensajePrincipal = 'Cuotas vencidas pendientes';
-            iconoClase = 'fa-solid fa-exclamation-triangle';
-          } else if (cuotasPendientes.length > 0) {
-            // Solo cuotas pendientes (no vencidas)
-            const pendientesTexto = cuotasPendientes.length === 1 ? '1 cuota pendiente' : `${cuotasPendientes.length} cuotas pendientes`;
-            detalleTexto = `Tienes ${pendientesTexto} de pago`;
-            mensajePrincipal = 'Cuotas pendientes de pago';
-            iconoClase = 'fa-solid fa-clock';
-            colorClase = 'text-orange-600';
-          }
+          // Hay cuotas pendientes - mensaje claro y simple
+          const mensajePendientes = cuotasPendientes.length === 1 
+            ? `Tienes 1 cuota pendiente de pago` 
+            : `Tienes ${cuotasPendientes.length} cuotas pendientes de pago`;
 
           mensajeDetalle = `
-            <div class="text-xs ${colorClase} mt-2">
-              <i class="${iconoClase} mr-1"></i>
-              ${mensajePrincipal}
-              <div class="font-medium mt-1">${detalleTexto}</div>
+            <div class="text-xs text-red-600 mt-2">
+              <i class="fa-solid fa-lock mr-1"></i>
+              <div class="font-medium">Derecho de examen no disponible</div>
+              <div class="mt-1">${mensajePendientes}</div>
               <div class="text-xs mt-2 opacity-75">
                 Debes estar al día con todas las cuotas para poder abonar el derecho de examen
               </div>
@@ -737,31 +714,45 @@ function mostrarDetallesCurso(curso) {
         }
       }
 
-      // LÓGICA PRINCIPAL: Mostrar/ocultar botón de pago del derecho de examen
+      // NUEVA LÓGICA DEL BOTÓN DE PAGO DEL DERECHO DE EXAMEN
       if (payExamFeeButton) {
-        // CONDICIONES ESTRICTAS para habilitar el pago del derecho de examen:
-        // 1. El derecho de examen NO debe estar pagado
-        // 2. TODAS las cuotas regulares deben estar pagadas (pagado == '1' o '2')
-        // 3. NO debe haber cuotas pendientes (pagado == '0')
-        // 4. NO debe haber cuotas vencidas (pendientes con fecha vencida)
-        const puedeAbonarExamen = !examenPagado &&
-          todasCuotasPagadas &&
-          cuotasPendientes.length === 0 &&
-          cuotasVencidas.length === 0;
+        // Condición simple: El examen NO debe estar pagado Y TODAS las cuotas regulares deben estar pagadas
+        const puedeAbonarExamen = !examenPagado && todasCuotasPagadas;
 
-        console.log('[DEBUG EXAMEN] Evaluación para habilitar pago:', {
+        console.log('[DERECHO EXAMEN] Evaluación simplificada:', {
           puedeAbonar: puedeAbonarExamen,
           examenNoPagado: !examenPagado,
-          todasPagadas: todasCuotasPagadas,
-          sinPendientes: cuotasPendientes.length === 0,
-          sinVencidas: cuotasVencidas.length === 0
+          todasCuotasPagadas: todasCuotasPagadas,
+          cuotasPendientes: cuotasPendientes.length
         });
 
         if (puedeAbonarExamen) {
-          // Mostrar botón de pago habilitado
+          // Mostrar y habilitar botón
           payExamFeeButton.classList.remove('hidden');
+          payExamFeeButton.disabled = false;
           payExamFeeButton.innerHTML = '<i class="fa-solid fa-graduation-cap mr-2"></i>Pagar Derecho de Examen';
           payExamFeeButton.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+          
+          // Configurar evento de click
+          payExamFeeButton.onclick = () => {
+            const confirmacion = confirm(`¿Confirmas el pago del derecho de examen por $${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}?`);
+            
+            if (confirmacion) {
+              showToast("Redirigiendo al sistema de pagos...", "info");
+              
+              // Aquí integrarías con tu sistema de pagos real
+              console.log('[DERECHO EXAMEN] Iniciando pago:', {
+                cuota: cuotaExamen.cuota,
+                importe: cuotaExamen.importe,
+                mes: cuotaExamen.mes
+              });
+              
+              // Simulación temporal (remover en producción)
+              setTimeout(() => {
+                showToast("Pago procesado correctamente", "success");
+              }, 2000);
+            }
+          };
         } else {
           // Ocultar botón cuando no se cumplen las condiciones
           payExamFeeButton.classList.add('hidden');
