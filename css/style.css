@@ -622,7 +622,7 @@ ilos mejorados para la card de progreso académico */
   }
 
   .academic-progress-card h4 {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .mobile-progress-circle svg {
@@ -631,7 +631,40 @@ ilos mejorados para la card de progreso académico */
   }
 
   .mobile-stats {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
+  }
+
+  .certificate-mobile-card,
+  .exam-fee-mobile-card {
+    font-size: 0.8rem !important;
+  }
+
+  .certificates-mobile-content {
+    font-size: 0.8rem !important;
+  }
+
+  .course-header-card,
+  .course-info-grid {
+    font-size: 0.8rem !important;
+  }
+
+  .status-badge,
+  .certificate-grade-badge,
+  .px-3.py-1.rounded-full.text-xs.font-medium {
+    font-size: 0.7rem !important;
+  }
+
+  .quick-access-card {
+    font-size: 0.8rem !important;
+  }
+
+  .tab-content {
+    font-size: 0.8rem !important;
+  }
+
+  .bg-white.rounded-lg.shadow-sm.border,
+  .bg-gray-800.rounded-lg.shadow-sm.border {
+    font-size: 0.8rem !important;
   }
 }
 
@@ -754,15 +787,15 @@ para el acordeón de certificados móvil */
 
 /* Estados de certificados */
 .certificate-available {
-  border-left: 3px solid #10b981;
+  border-left: 2px solid #10b981;
 }
 
 .certificate-pending {
-  border-left: 3px solid #f59e0b;
+  border-left: 2px solid #f59e0b;
 }
 
 .certificate-unavailable {
-  border-left: 3px solid #ef4444;
+  border-left: 2px solid #ef4444;
 }
 
 /* Animación de carga para certificados */
@@ -1101,13 +1134,13 @@ para el acordeón de certificados móvil */
 
 /* Sistema de Bordes Redondeados */
 :root {
-  --border-radius-xs: 0.25rem;    /* 4px - Para elementos pequeños */
-  --border-radius-sm: 0.375rem;   /* 6px - Para botones pequeños, badges */
-  --border-radius-md: 0.5rem;     /* 8px - Para cards, inputs, botones */
-  --border-radius-lg: 0.75rem;    /* 12px - Para cards grandes, containers */
-  --border-radius-xl: 1rem;       /* 16px - Para cards destacadas, modales */
-  --border-radius-2xl: 1.5rem;    /* 24px - Para elementos muy destacados */
-  --border-radius-full: 9999px;   /* Para círculos perfectos */
+  --border-radius-xs: 0.125rem;    /* 2px - Para elementos pequeños */
+  --border-radius-sm: 0.25rem;     /* 4px - Para botones pequeños, badges */
+  --border-radius-md: 0.375rem;    /* 6px - Para cards, inputs, botones */
+  --border-radius-lg: 0.5rem;      /* 8px - Para cards grandes, containers */
+  --border-radius-xl: 0.75rem;     /* 12px - Para cards destacadas, modales */
+  --border-radius-2xl: 1rem;       /* 16px - Para elementos muy destacados */
+  --border-radius-full: 9999px;    /* Para círculos perfectos */
 }
 
 /* Sistema de Espaciado */
@@ -1136,19 +1169,21 @@ para el acordeón de certificados móvil */
    ========================================================================== */
 
 /* Cards Principales */
+/* Cards Principales */
 .bg-white.rounded-xl,
 .bg-white.rounded-lg,
 .bg-gray-800.rounded-xl,
 .bg-gray-800.rounded-lg {
-  border-radius: var(--border-radius-xl) !important;
+  border-radius: var(--border-radius-lg) !important;
   box-shadow: var(--shadow-md) !important;
 }
 
 /* Tarjetas de Estadísticas del Dashboard */
+/* Tarjetas de Estadísticas del Dashboard */
 .bg-white.rounded-xl.p-4,
 .bg-gray-800.rounded-xl.p-4 {
   padding: var(--space-4) !important;
-  border-radius: var(--border-radius-xl) !important;
+  border-radius: var(--border-radius-lg) !important;
 }
 
 /* Icon Circles - Estandarización */
@@ -1168,8 +1203,9 @@ para el acordeón de certificados móvil */
 }
 
 /* Quick Access Cards */
+/* Quick Access Cards */
 .quick-access-card {
-  border-radius: var(--border-radius-lg) !important;
+  border-radius: var(--border-radius-md) !important;
   padding: var(--space-4) !important;
   box-shadow: var(--shadow-sm) !important;
   transition: all 0.2s ease-in-out !important;
@@ -1228,9 +1264,10 @@ select {
 }
 
 /* Cards de Acordeón Mobile */
+/* Cards de Acordeón Mobile */
 .bg-white.rounded-lg.shadow-sm.border,
 .bg-gray-800.rounded-lg.shadow-sm.border {
-  border-radius: var(--border-radius-lg) !important;
+  border-radius: var(--border-radius-md) !important;
   padding: var(--space-4) !important;
   border: 1px solid #e5e7eb !important;
 }
@@ -1242,52 +1279,52 @@ select {
 
 /* Header Cards */
 .course-header-card {
-  border-radius: var(--border-radius-xl) !important;
+  border-radius: var(--border-radius-lg) !important;
   padding: var(--space-5) !important;
 }
 
 /* Academic Progress Card */
 .academic-progress-card {
-  border-radius: var(--border-radius-xl) !important;
+  border-radius: var(--border-radius-lg) !important;
   padding: var(--space-6) !important;
 }
 
 /* Attendance Gradient */
 .attendance-gradient {
-  border-radius: var(--border-radius-lg) !important;
+  border-radius: var(--border-radius-md) !important;
   padding: var(--space-4) !important;
 }
 
 /* Academic Tip */
 .academic-tip {
-  border-radius: var(--border-radius-md) !important;
+  border-radius: var(--border-radius-sm) !important;
   padding: var(--space-3) !important;
 }
 
 /* Certificate Cards */
 .certificate-mobile-card,
 .exam-fee-mobile-card {
-  border-radius: var(--border-radius-md) !important;
+  border-radius: var(--border-radius-sm) !important;
   padding: var(--space-3) !important;
 }
 
 /* Profile Cards */
 .bg-white.shadow-sm.rounded-xl,
 .bg-card-dark.shadow-sm.rounded-xl {
-  border-radius: var(--border-radius-xl) !important;
+  border-radius: var(--border-radius-lg) !important;
   padding: var(--space-6) !important;
 }
 
 /* Toast Notification */
 #toast {
-  border-radius: var(--border-radius-lg) !important;
+  border-radius: var(--border-radius-md) !important;
   padding: var(--space-4) !important;
 }
 
 /* Bottom Bar */
 #bottombar {
-  border-top-left-radius: var(--border-radius-lg) !important;
-  border-top-right-radius: var(--border-radius-lg) !important;
+  border-top-left-radius: var(--border-radius-md) !important;
+  border-top-right-radius: var(--border-radius-md) !important;
   padding: var(--space-2) 0 !important;
 }
 

@@ -916,7 +916,7 @@ function mostrarDetallesCurso(curso) {
       let estadoClass = 'bg-yellow-100 text-yellow-800';
 
       if (pagada) {
-        estadoTexto = cuotaMostrar.pagado == '2' ? 'Pronto Pago' : 'Pagada';
+  estadoTexto = 'Pagada';
         estadoClass = 'bg-green-100 text-green-800';
       } else {
         // Verificar si está vencida
@@ -1045,7 +1045,7 @@ function mostrarDetallesCurso(curso) {
           estadoTexto = cuotaExamen.pagado == '2' ? 'Pagado (Pronto Pago)' : 'Pagado';
           estadoClass = 'bg-green-100 text-green-800';
         } else if (todasCuotasPagadas) {
-          estadoTexto = 'Disponible para Pago';
+          estadoTexto = 'Disponible';
           estadoClass = 'bg-blue-100 text-blue-800';
         } else {
           estadoTexto = 'No Disponible';
@@ -1301,17 +1301,11 @@ function mostrarDetallesCurso(curso) {
 
     // Función para obtener el estado visual de una cuota
     function getEstadoCuota(cuota) {
-      if (cuota.pagado == '1') {
+      if (cuota.pagado == '1' || cuota.pagado == '2') {
         return {
           texto: 'Pagada',
           clase: 'bg-green-100 text-green-800 border-green-200',
           icono: 'fa-check-circle text-green-600'
-        };
-      } else if (cuota.pagado == '2') {
-        return {
-          texto: 'Pronto Pago',
-          clase: 'bg-blue-100 text-blue-800 border-blue-200',
-          icono: 'fa-clock text-blue-600'
         };
       } else {
         // Verificar si está vencida
@@ -1472,7 +1466,7 @@ function mostrarDetallesCurso(curso) {
                           <span class="font-medium">${cuota.mes}</span>
                         </div>
                         <div class="flex justify-between items-center p-2 bg-white/30 rounded">
-                          <span class="text-gray-700">${cuota.pagado == '2' ? 'Pagó (Pronto Pago):' : 'Importe:'}</span>
+                          <span class="text-gray-700">Importe:</span>
                           <span class="font-bold">$${(cuota.pagado == '2' && prontoPago ? prontoPago : importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
                         </div>
                         <div class="flex justify-between items-center p-2 bg-white/30 rounded">
