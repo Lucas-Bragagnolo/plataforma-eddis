@@ -1,0 +1,15 @@
+[33m147362d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m feat: Normalización de fechas con Luxon - Formato dd/mm/aaaa
+[33m8752d4e[m feat: Mejora del course header y solución de scroll en mobile
+[33m65cca4f[m Implementa acordeón de certificados para móviles con botones de impresión
+[33m5279d35[m Simplifica la card de progreso removiendo rendimiento y optimizando para mobile
+[33mc434c4f[m Mejora la card de progreso del curso con mejor comunicación de asistencia y progreso
+[33ma5035d0[m Corregir función del botón volver - ocultar correctamente cuenta corriente
+[33me509502[m Implementar acordeón móvil para cuotas - mejora UX en dispositivos pequeños
+[33mdeefea4[m Mejorar diseño del derecho de examen y simplificar información de cuotas
+[33m30376fb[m Corregir referencia a cuotasFiltradas por curso.cuotas en cuenta corriente
+[33m455507d[m Implementar nueva cuenta corriente mejorada con vista de tarjetas y estadísticas
+[33mb404740[m Agregar logs adicionales y forzar ocultación del botón derecho de examen
+[33m2fbbf78[m Mejora lógica del derecho de examen - simplificada y más clara
+[33m25d067f[m Checkpoint: Estado actual del proyecto antes de nuevos cambios
+[33mc7b9958[m Integración con API: Actualización para manejar datos reales del alumno
+[33m61486b5[m Initial commit: Plataforma de alumnos - estructura base del proyecto

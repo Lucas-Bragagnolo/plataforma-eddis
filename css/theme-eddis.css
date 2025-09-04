@@ -5,17 +5,16 @@
   --primary-light: rgb(65, 80, 144);
   --gray-custom: rgb(131, 125, 127);
   /* Dark mode variables */
-  --bg-dark: #142042;           /* Azul principal accesible AAA */
+  --bg-dark: #142042; /* Azul principal accesible AAA */
   --bg-dark-secondary: #32417f; /* Azul secundario más suave */
-  --primary-darkmode: #32417f;  /* Azul intermedio para elementos destacados */
-  --text-dark: #ffffff;         /* Blanco puro para contraste máximo */
+  --primary-darkmode: #32417f; /* Azul intermedio para elementos destacados */
+  --text-dark: #ffffff; /* Blanco puro para contraste máximo */
   --text-dark-secondary: #e0e6f1; /* Gris muy claro para textos secundarios */
-  --border-dark: #2d3959;       /* Azul grisáceo para bordes */
-  --card-dark: #142042; 
-          /* Igual que secondary para tarjetas */
-  --gray-dark: #a6b0c3;         /* Gris neutro para detalles sutiles */
+  --border-dark: #2d3959; /* Azul grisáceo para bordes */
+  --card-dark: #142042;
+  /* Igual que secondary para tarjetas */
+  --gray-dark: #a6b0c3; /* Gris neutro para detalles sutiles */
 }
-
 
 body {
   --sb-track-color: #ffffff;
@@ -24,7 +23,7 @@ body {
 }
 
 body::-webkit-scrollbar {
-  width: var(--sb-size)
+  width: var(--sb-size);
 }
 
 body::-webkit-scrollbar-track {
@@ -35,13 +34,11 @@ body::-webkit-scrollbar-track {
 body::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-color);
   border-radius: 3px;
-  
 }
 
 @supports not selector(::-webkit-scrollbar) {
   body {
-    scrollbar-color: var(--sb-thumb-color)
-                     var(--sb-track-color);
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
 }
 
@@ -131,17 +128,79 @@ header {
 }
 .dark .shadow-lg,
 .dark .shadow-sm {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* Added styles for publications grid and cards */
+/* Estilos para las publicaciones */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Animaciones para las tarjetas de publicaciones */
+#publicacionesGrid .bg-white {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#publicacionesGrid .bg-white:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive grid improvements */
+@media (min-width: 640px) {
+  #publicacionesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  #publicacionesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  #publicacionesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Dark mode styles for publications */
+.dark #publicacionesGrid .bg-white {
+  background-color: var(--card-dark) !important;
+  border-color: var(--border-dark) !important;
+}
+
+.dark #publicacionesGrid h3,
+.dark #publicacionesGrid p,
+.dark #publicacionesGrid span {
+  color: var(--text-dark) !important;
+}
+
+.dark #publicacionesGrid .text-gray-600 {
+  color: var(--text-dark-secondary) !important;
+}
+
+.dark #publicacionesGrid .text-gray-500 {
+  color: var(--text-dark-secondary) !important;
+}
 
 * {
-  font-family: 'Stolzl', system-ui, sans-serif;
+  font-family: "Stolzl", system-ui, sans-serif;
 }
 /* Estilos base */
 body {
   font-family: "stolzl", sans-serif;
-
 }
 
 /* Estilos del menú */
@@ -160,7 +219,7 @@ body {
   text-align: center;
 }
 
-.bg-menu{
+.bg-menu {
   background-color: white;
 }
 

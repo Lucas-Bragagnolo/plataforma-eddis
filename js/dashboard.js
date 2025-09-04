@@ -1,11 +1,162 @@
-// Simple Dashboard Module
+// Dashboard Module - Funcionalidades modernas e interactivas
 
 //console.log('[DEBUG] Dashboard.js cargado');
 import { apiService, ApiError, COUNTRIES } from "./api.js"
 import { showToast, formatDate, formatDateShort } from "./utils.js"
 import { checkAuthStatus, logout } from "./auth.js"
- 
-// Mostrar estado vacío cuando no hay datos
+
+// Clase para el Dashboard Interactivo Moderno
+class ModernDashboard {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.animateStatistics();
+        this.setupRealTimeUpdates();
+    }
+
+    setupEventListeners() {
+        // Efectos hover para tarjetas de acceso rápido
+        const quickAccessCards = document.querySelectorAll('.quick-access-card');
+        quickAccessCards.forEach(card => {
+            card.addEventListener('mouseenter', this.handleCardHover);
+            card.addEventListener('mouseleave', this.handleCardLeave);
+            card.addEventListener('click', this.handleQuickAccess);
+        });
+
+        // Efectos para tarjetas de estadísticas
+        const statCards = document.querySelectorAll('.bg-white.rounded-xl, .bg-gray-800.rounded-xl');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+            });
+        });
+    }
+
+    handleCardHover(e) {
+        const card = e.currentTarget;
+        card.style.transform = 'translateY(-4px)';
+        card.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.2)';
+        
+        const icon = card.querySelector('.fa-solid');
+        if (icon) {
+            icon.style.transform = 'scale(1.15)';
+        }
+    }
+
+    handleCardLeave(e) {
+        const card = e.currentTarget;
+        card.style.transform = 'translateY(0)';
+        card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        
+        const icon = card.querySelector('.fa-solid');
+        if (icon) {
+            icon.style.transform = 'scale(1)';
+        }
+    }
+
+    handleQuickAccess(e) {
+        e.preventDefault();
+        const card = e.currentTarget;
+        const action = card.querySelector('span').textContent.toLowerCase();
+        
+        // Feedback visual al hacer clic
+        card.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            card.style.transform = 'scale(1)';
+        }, 150);
+
+        // Navegación según el acceso rápido
+        switch(action) {
+            case 'clases online':
+                showToast('Redirigiendo a Clases Online...', 'info');
+                break;
+            case 'materiales':
+                showToast('Accediendo a Materiales...', 'info');
+                break;
+            case 'calificaciones':
+                showToast('Cargando Calificaciones...', 'info');
+                break;
+            case 'foros':
+                showToast('Abriendo Foros...', 'info');
+                break;
+        }
+    }
+
+    animateStatistics() {
+        // Animación de conteo para las estadísticas
+        const statValues = document.querySelectorAll('.text-xl.font-bold');
+        statValues.forEach(element => {
+            const text = element.textContent;
+            if (text.includes('%')) {
+                const finalValue = parseInt(text);
+                this.animateValue(element, 0, finalValue, 2000);
+            } else {
+                const finalValue = parseInt(text);
+                this.animateValue(element, 0, finalValue, 1500);
+            }
+        });
+    }
+
+    animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            element.textContent = element.textContent.includes('%') ? value + '%' : value;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    setupRealTimeUpdates() {
+        // Simular actualizaciones en tiempo real
+        setInterval(() => {
+            this.simulateRealTimeUpdate();
+        }, 30000); // Actualizar cada 30 segundos
+    }
+
+    simulateRealTimeUpdate() {
+        // Simular cambios menores en los datos
+        const attendanceElement = document.querySelector('[class*="bg-green"] .text-xl');
+        if (attendanceElement) {
+            const currentText = attendanceElement.textContent;
+            const currentAttendance = parseInt(currentText);
+            const newAttendance = Math.max(85, Math.min(98, currentAttendance + (Math.random() > 0.5 ? 1 : -1)));
+            
+            attendanceElement.textContent = newAttendance + '%';
+            
+            // Efecto visual de actualización
+            attendanceElement.classList.add('text-green-600');
+            setTimeout(() => {
+                attendanceElement.classList.remove('text-green-600');
+            }, 1000);
+        }
+    }
+}
+
+// Exportar para uso global
+ window.ModernDashboard = ModernDashboard;
+
+ // Inicializar dashboard moderno cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.dashboard-section')) {
+        new ModernDashboard();
+        console.log('[DEBUG] Dashboard moderno inicializado');
+    }
+});
+  
+ // Mostrar estado vacío cuando no hay datos
 function mostrarEstadoVacio() {
   //console.log('[DEBUG] Entrando a mostrarEstadoVacio');
   const emptyState = document.getElementById('emptyState');
@@ -94,7 +245,7 @@ function addCountryIndicator(countryInfo) {
 // Initialize dashboard
 async function initializeDashboard() {
   //console.log('[DEBUG] Entrando a initializeDashboard');
-  showTab("tab-cursos-actuales");
+  showTab("inicioContent"); // Mostrar tab de inicio al cargar
   //console.log('[DEBUG] Tab mostrado');
 
   try {
@@ -837,35 +988,14 @@ function mostrarDetallesCurso(curso) {
         }
         // Mostrar cuenta corriente
         const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
+        const estadoCuentaDesktop = document.getElementById('estadoCuentaDesktop');
+        const examFeeCard = document.getElementById('examFeeCard');
+                
         if (cuentaContainer) {
           cuentaContainer.style.display = '';
           cuentaContainer.innerHTML = '';
-          let volverBtn = document.getElementById('volverDatosCursoBtn');
-          if (!volverBtn) {
-            volverBtn = document.createElement('button');
-            volverBtn.id = 'volverDatosCursoBtn';
-            volverBtn.className = 'mb-4 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
-            volverBtn.innerHTML = '<i class="fa-solid fa-arrow-left mr-2"></i>Volver a los datos del curso';
-            cuentaContainer.parentElement.insertBefore(volverBtn, cuentaContainer);
-          }
-          volverBtn.onclick = () => {
-            // Mostrar panel detalle
-            if (detalles) detalles.style.display = '';
-            if (sidebar) sidebar.style.display = '';
-
-            // Buscar y mostrar los paneles de la sidebar
-            const estadoCuotaCard = sidebar?.querySelector('.bg-white');
-            const examFeeCardElement = document.getElementById('examFeeCard');
-
-            // Ocultar completamente el contenedor de cuenta corriente
-            cuentaContainer.style.display = 'none';
-            cuentaContainer.innerHTML = '';
-
-            // Remover el botón
-            volverBtn.remove();
-
-            console.log('[DEBUG] Volviendo a vista normal del curso');
-          };
+          if (estadoCuentaDesktop) estadoCuentaDesktop.classList.add('lg:hidden');
+          if (examFeeCard) examFeeCard.classList.add('lg:hidden');
           mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
         }
       };
@@ -1148,13 +1278,16 @@ function mostrarDetallesCurso(curso) {
     // Mostrar todos los datos
     const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
     const sidebar = document.querySelector('#courseDetails [class*=space-y-6]');
+    const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
     if (detalles) detalles.style.display = '';
     if (sidebar) sidebar.style.display = '';
+    if (cuentaContainer) {
+      cuentaContainer.style.display = 'none';
+      cuentaContainer.innerHTML = '';
+    }
     // Quitar botón volver
     let volverBtn = document.getElementById('volverDatosCursoBtn');
     if (volverBtn) volverBtn.remove();
-    // Limpiar cuenta corriente
-    mostrarHistorialCuotasEnPantalla(curso.cuotas, curso.textoplan);
   }
 
   // Mostrar historial de cuotas en pantalla - VERSIÓN MEJORADA
@@ -1204,8 +1337,12 @@ function mostrarDetallesCurso(curso) {
       <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6">
         <!-- Header con estadísticas -->
         <div class="mb-6">
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Cuenta Corriente - ${nombreCurso}</h3>
-          
+          <div class="flex space-x-2 items-center mb-4">
+            <button id="volverDatosCursoBtn2" class="mb-3 inline-flex items-center px-3 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg shadow-sm transition-colors duration-200" title="Volver">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gray-900">Cuenta Corriente - ${nombreCurso}</h3>
+          </div>
           <!-- Barra de progreso -->
           <div class="mb-4">
             <div class="flex justify-between text-sm text-gray-600 mb-2">
@@ -1244,58 +1381,52 @@ function mostrarDetallesCurso(curso) {
         <div class="space-y-3">
           <h4 class="text-lg font-semibold text-gray-900 mb-3">Cuotas Regulares</h4>
           
-          <!-- Vista Desktop: Grid de tarjetas -->
-          <div class="hidden sm:grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            ${cuotasRegulares.map(cuota => {
-      const estado = getEstadoCuota(cuota);
-      const importe = parseFloat(cuota.importe);
-      const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
-
-      return `
-                <div class="border rounded-lg p-4 ${estado.clase} transition-all duration-200 hover:shadow-md">
-                  <!-- Header de la cuota -->
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center space-x-2">
-                      <span class="text-lg font-bold">Cuota ${cuota.cuota}</span>
-                      <i class="fas ${estado.icono}"></i>
-                    </div>
-                    <span class="px-2 py-1 rounded-full text-xs font-medium ${estado.clase}">
-                      ${estado.texto}
-                    </span>
-                  </div>
-                  
-                  <!-- Información de la cuota -->
-                  <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Mes:</span>
-                      <span class="font-medium">${cuota.mes}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">${cuota.pagado == '2' ? 'Pagó (Pronto Pago):' : 'Importe:'}</span>
-                      <span class="font-bold">$${(cuota.pagado == '2' && prontoPago ? prontoPago : importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Vencimiento:</span>
-                      <span class="font-medium">${formatDate(cuota.fechaven)}</span>
-                    </div>
-                  </div>
-                  
-                  <!-- Botón de impresión (solo si está pagada y tiene link de recibo) -->
-                  ${(cuota.pagado == '1' || cuota.pagado == '2') ? `
-                  <div class="mt-3 pt-3 border-t border-black/10">
-                    <button 
-                      onclick="window.open('${cuota.linkRecibo}', '_blank')"
-                      class="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200"
-                      title="Imprimir recibo de pago"
-                    >
-                      <i class="fas fa-print"></i>
-                      <span>Imprimir Recibo</span>
-                    </button>
-                  </div>
-                  ` : ''}
-                </div>
-              `;
-    }).join('')}
+          <!-- Vista Desktop: Tabla de cuotas -->
+          <div class="hidden sm:block">
+            <table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Cuota</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Mes</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Importe</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Vencimiento</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Estado</th>
+                  <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700">Recibo</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-100">
+                ${cuotasRegulares.map(cuota => {
+                  const estado = getEstadoCuota(cuota);
+                  const importe = parseFloat(cuota.importe);
+                  const prontoPago = cuota.ppago && cuota.ppago !== '0.00' ? parseFloat(cuota.ppago) : null;
+                  return `
+                    <tr class="transition-colors duration-150 hover:bg-blue-50">
+                      <td class="px-4 py-2 font-bold text-gray-900">${cuota.cuota}</td>
+                      <td class="px-4 py-2 text-gray-700">${cuota.mes}</td>
+                      <td class="px-4 py-2 font-bold text-gray-900">$${(cuota.pagado == '2' && prontoPago ? prontoPago : importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
+                      <td class="px-4 py-2 text-gray-700">${formatDate(cuota.fechaven)}</td>
+                      <td class="px-4 py-2">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${estado.clase}">
+                          <i class="fas ${estado.icono} mr-1"></i>${estado.texto}
+                        </span>
+                      </td>
+                      <td class="px-4 py-2">
+                        ${(cuota.pagado == '1' || cuota.pagado == '2') && cuota.linkRecibo ? `
+                          <button 
+                            onclick="window.open('${cuota.linkRecibo}', '_blank')"
+                            class="flex items-center space-x-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors duration-200"
+                            title="Imprimir recibo de pago"
+                          >
+                            <i class="fas fa-print"></i>
+                            <span>Recibo</span>
+                          </button>
+                        ` : `<span class='text-gray-400 text-xs'>-</span>`}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
           </div>
 
           <!-- Vista Móvil: Acordeón -->
@@ -1422,6 +1553,40 @@ function mostrarDetallesCurso(curso) {
         </div>
       </div>
     `;
+
+    const volverBtn = document.getElementById('volverDatosCursoBtn2');
+    if (volverBtn) {
+      volverBtn.onclick = () => {
+        // Mostrar panel detalle
+        const detalles = document.querySelector('#courseDetails [class*=col-span-2]');
+        const sidebar = document.querySelector('#courseDetails > div > div.space-y-4');
+        if (detalles) detalles.style.display = '';
+        if (sidebar) sidebar.style.display = '';
+
+        const estadoCuentaDesktop = document.getElementById('estadoCuentaDesktop');
+        const examFeeCard = document.getElementById('examFeeCard');
+        if (estadoCuentaDesktop) {
+          estadoCuentaDesktop.classList.remove('lg:hidden');
+          estadoCuentaDesktop.classList.add('lg:block');
+        }
+        if (examFeeCard) {
+          examFeeCard.classList.remove('lg:hidden');
+          examFeeCard.classList.add('lg:block');
+        }
+
+        // Ocultar completamente el contenedor de cuenta corriente
+        const cuentaContainer = document.getElementById('cuentaCorrienteContainer');
+        if (cuentaContainer) {
+          cuentaContainer.style.display = 'none';
+          cuentaContainer.innerHTML = '';
+        }
+
+        // Remover el botón
+        volverBtn.remove();
+
+        console.log('[DEBUG] Volviendo a vista normal del curso');
+      };
+    }
 
     // Agregar función para manejar el acordeón (solo se ejecuta una vez)
     if (!window.toggleAccordion) {

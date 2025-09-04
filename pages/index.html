@@ -59,7 +59,11 @@
 
         <!-- Menú de navegación -->
         <nav class="flex flex-col px-4 mt-4 space-y-2" id="menuNav">
-          <button class="menu-item flex items-center space-x-2 p-2 rounded active-tab" data-tab="tab-cursos-actuales">
+          <button class="menu-item flex items-center space-x-2 p-2 rounded active-tab" data-tab="inicioContent">
+            <i class="fa-solid fa-home"></i>
+            <span class="menu-text">Inicio</span>
+          </button>
+          <button class="menu-item flex items-center space-x-2 p-2 rounded" data-tab="tab-cursos-actuales">
             <i class="fa-solid fa-graduation-cap"></i>
             <span class="menu-text">Cursos</span>
           </button>
@@ -111,11 +115,123 @@
 
     <!-- Contenido principal con tabs -->
     <main class="flex-1 p-2 ">
+      <!-- Tab: Inicio -->
+      <div id="inicioContent" class="tab-content">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-text-dark mb-2">Bienvenido a tu plataforma</h2>
+          
+          <!-- Dashboard de Estadísticas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- Tarjeta de Cursos Activos -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fa-solid fa-book text-blue-600 dark:text-blue-300"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-text-dark-secondary">Cursos Activos</p>
+                  <p class="text-xl font-bold text-gray-900 dark:text-text-dark">3</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta de Asistencia -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fa-solid fa-user-check text-green-600 dark:text-green-300"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-text-dark-secondary">Asistencia</p>
+                  <p class="text-xl font-bold text-gray-900 dark:text-text-dark">92%</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta de Próximas Clases -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fa-solid fa-calendar text-orange-600 dark:text-orange-300"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-text-dark-secondary">Próximas Clases</p>
+                  <p class="text-xl font-bold text-gray-900 dark:text-text-dark">2</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tarjeta de Tareas Pendientes -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
+                  <i class="fa-solid fa-clipboard-list text-purple-600 dark:text-purple-300"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 dark:text-text-dark-secondary">Tareas Pendientes</p>
+                  <p class="text-xl font-bold text-gray-900 dark:text-text-dark">4</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accesos Rápidos -->
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-text-dark mb-4">Accesos Rápidos</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <a href="#" class="quick-access-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa-solid fa-video text-blue-600 dark:text-blue-300 text-xl"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-text-dark">Clases Online</span>
+              </a>
+              
+              <a href="#" class="quick-access-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa-solid fa-file-alt text-green-600 dark:text-green-300 text-xl"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-text-dark">Materiales</span>
+              </a>
+              
+              <a href="#" class="quick-access-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa-solid fa-chart-line text-orange-600 dark:text-orange-300 text-xl"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-text-dark">Calificaciones</span>
+              </a>
+              
+              <a href="#" class="quick-access-card bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa-solid fa-comments text-purple-600 dark:text-purple-300 text-xl"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-700 dark:text-text-dark">Foros</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Sección de Publicaciones -->
+          <div class="mt-8">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-text-dark">Últimas Publicaciones</h3>
+              <button class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                Ver todas <i class="fa-solid fa-arrow-right ml-1"></i>
+              </button>
+            </div>
+            <div id="publicacionesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Las publicaciones se cargarán aquí dinámicamente -->
+            </div>
+          </div>
+          
+          <p class="text-gray-600 dark:text-text-dark-secondary mt-4">Mantente al día con las últimas novedades y anuncios</p>
+        </div>
+
+      </div>
+
       <!-- Tab: Cursos Actuales -->
-      <div id="tab-cursos-actuales" class="tab-content">
+      <div id="tab-cursos-actuales" class="tab-content hidden">
 
         <!-- Mensaje en Vacio -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-2">
+        <div id="cursoSelectorBlock" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-2">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div class="mb-4 sm:mb-0">
               <h2 class="text-lg sm:text-lg text-base font-medium text-gray-900 mb-1">Seleccionar Curso</h2>
@@ -133,33 +249,35 @@
           </div>
         </div>
 
-        <!-- Course Details Area -->
+        <!-- DETALLE CURSO CONTAINER -->
         <div id="courseDetails" class="hidden fade-in">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
-            <!-- Historial de cuotas responsive -->
+            <!-- CUENTA CORRIENTE -->
             <div class="lg:col-span-3" id="cuentaCorrienteContainer"></div>
             <!-- Main Course Info -->
-            <div class="lg:col-span-2 space-y-4">
+            <div class="lg:col-span-2 space-y-2">
+
               <!-- Course Header - Simplificado con Constancia -->
               <div class="course-header-card bg-white rounded-xl shadow-sm border border-gray-100 p-5 md:p-6">
                 <div class="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
                   <!-- Información del Curso -->
                   <div class="flex-1 min-w-0">
                     <div class="flex items-start space-x-3">
-                      <!-- Icono del curso -->
+                      <!-- VOLVER -->
                       <div class="flex-shrink-0">
-                        <div class="course-header-icon w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-                          <i class="fa-solid fa-book-open text-white text-lg md:text-xl"></i>
-                        </div>
+                        <button id="btnVolverSeleccionCurso" class="mb-3 inline-flex items-center px-3 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium rounded-lg shadow-sm transition-colors duration-200">
+                          <i class="fa-solid fa-arrow-left mr-2"></i>                          
+                        </button>
                       </div>
                       
                       <!-- Detalles del curso -->
                       <div class="flex-1 min-w-0">
-                        <h3 id="courseName" class="text-xl md:text-2xl font-bold text-gray-900 mb-2 leading-tight"></h3>
-                        
+                        <h3 id="courseName" class="text-sm md:text-2xl  font-bold text-gray-900 mb-2 leading-tight"></h3>
+                        <!-- Botón volver a seleccionar curso -->
+
                         <!-- Status del curso - Visible en mobile y desktop -->
                         <div class="flex items-center space-x-2">
-                          <span id="courseStatus" class="inline-flex items-center px-2.5 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-medium"></span>
+                          <span id="courseStatus" class="inline-flex items-center px-1 py-1 md:px-3 md:py-1.5 rounded-full text-xs md:text-sm font-medium"></span>
                         </div>
                       </div>
                     </div>
@@ -177,7 +295,7 @@
               </div>
 
               <!-- Card de Asistencia y Progreso - Simplificada -->
-              <div class="academic-progress-card rounded-lg shadow-sm p-4 md:p-6 fade-in-up">
+              <div class="bg-white academic-progress-card rounded-lg shadow-sm p-4 md:p-6 fade-in-up">
                 <!-- Versión Desktop -->
                 <div class="hidden md:block">
                   <div class="flex items-center justify-between mb-6">
@@ -333,7 +451,6 @@
                   </div>
                 </div>
               </div>
-
               <!-- Estado de Cuota Mobile - Acordeón -->
               <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:hidden">
                 <button id="paymentMobileToggle" class="payment-mobile-accordion w-full flex items-center justify-between text-left focus:outline-none rounded-lg p-2 -m-2">
@@ -384,7 +501,6 @@
                   </div>
                 </div>
               </div>
-
               <!-- Derecho de Examen Mobile - Acordeón -->
               <div id="examFeeMobileCard" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:hidden hidden">
                 <button id="examFeeMobileToggle" class="exam-fee-mobile-accordion w-full flex items-center justify-between text-left focus:outline-none rounded-lg p-2 -m-2">
@@ -470,7 +586,7 @@
               
               
               <!-- Payment Status -->
-              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden lg:block">
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hidden lg:block" id="estadoCuentaDesktop">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-lg font-medium text-gray-900">Estado de Cuota</h4>
                   <i class="fa-solid fa-credit-card text-gray-400"></i>
@@ -580,7 +696,10 @@
                 <span class="text-sm">Restablecer Contraseña</span>
               </button>
               <button
-                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border border-gray-300 dark:border-border-dark bg-transparent text-gray-700 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-bg-dark-secondary transition-colors">
+                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border border-gray-300 dark:border-border-dark bg-transparent text-gray-700 dark:text-text-dark hover:bg-gray-100 dark:hover:bg-bg-dark-secondary transition-colors"
+                id="cerrarSesionPerfilBtn"
+                type="button"
+                onclick="localStorage.clear(); window.location.href='login.html';">
                 <i class="fa-solid fa-sign-out-alt"></i>
                 <span class="text-sm">Cerrar Sesión</span>
               </button>
@@ -637,26 +756,32 @@
   <!-- Bottom Bar para móviles -->
   <nav id="bottombar"
     class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center py-2 z-50 shadow-lg md:hidden">
-    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" data-tab="tab-cursos-actuales">
+    <button class="menu-item flex flex-col items-center text-gray-700 focus:text-blue-600" data-tab="inicioContent">
+      <i class="fa-solid fa-home text-xl"></i>
+      <span class="text-xs">Inicio</span>
+    </button>
+    <button class="menu-item flex flex-col items-center text-gray-700 focus:text-blue-600" data-tab="tab-cursos-actuales">
       <i class="fa-solid fa-graduation-cap text-xl"></i>
       <span class="text-xs">Cursos</span>
     </button>
-    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" id="irSitioWeb">
+    <button class="menu-item flex flex-col items-center text-gray-700 focus:text-blue-600" id="irSitioWeb">
       <i class="fa-solid fa-globe text-xl"></i>
       <span class="text-xs">Web</span>
     </button>
-    <button class="flex flex-col items-center text-gray-700 focus:text-blue-600" id="cerrarSesionBtn">
+    <button class="menu-item flex flex-col items-center text-gray-700 focus:text-blue-600" id="cerrarSesionBtn">
       <i class="fa-solid fa-user text-xl"></i>
       <span class="text-xs">Perfil</span>
     </button>
   </nav>
   <!-- Swiper JS -->
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script src="../js/data.js" type="module"></script>
-  <script src="../js/dashboard.js" type="module"></script>
-  <script src="../js/courses.js" type="module"></script>
+  <script>
+    console.log('[DEBUG] index.html cargado correctamente');
+  </script>
   <script src="../js/script.js" type="module"></script>
   <script src="../js/bottombar-tabs.js" type="module"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script src="../js/dashboard.js" type="module"></script>
   <script>
     (function () {
       const entidad = localStorage.getItem('lastLoginCountry');
@@ -697,18 +822,6 @@
         });
       }).observe(document.body, { attributes: true });
     })();
-  </script>
-  <script>
-    // Test de Luxon
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof luxon !== 'undefined') {
-        console.log('✅ Luxon cargado correctamente');
-        const testDate = luxon.DateTime.fromISO('2024-01-15');
-        console.log('📅 Fecha de prueba:', testDate.toFormat('dd/MM/yyyy'));
-      } else {
-        console.error('❌ Luxon no está disponible');
-      }
-    });
   </script>
 </body>
 
