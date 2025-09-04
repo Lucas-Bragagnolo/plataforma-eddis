@@ -5,13 +5,13 @@
   --primary-light: rgb(65, 80, 144);
   --gray-custom: rgb(131, 125, 127);
   /* Dark mode variables */
-  --bg-dark: #142042; /* Azul principal accesible AAA */
+  --bg-dark: #151c3a; /* Azul principal accesible AAA */
   --bg-dark-secondary: #32417f; /* Azul secundario más suave */
   --primary-darkmode: #32417f; /* Azul intermedio para elementos destacados */
   --text-dark: #ffffff; /* Blanco puro para contraste máximo */
   --text-dark-secondary: #e0e6f1; /* Gris muy claro para textos secundarios */
   --border-dark: #2d3959; /* Azul grisáceo para bordes */
-  --card-dark: #142042;
+  --card-dark: #32417f;
   /* Igual que secondary para tarjetas */
   --gray-dark: #a6b0c3; /* Gris neutro para detalles sutiles */
 }

@@ -1,0 +1,32 @@
+/* Accesibilidad y dark mode para bottombar */
+@media (max-width: 768px) {
+  .bottombar-btn {
+    outline: none;
+    border: none;
+    background: none;
+    cursor: pointer;    
+    border-radius: 0.35rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    transition: background 0.2s, color 0.2s;
+    flex: 1 1 0;
+    width: 0;
+    max-width: 100%;
+  }
+
+
+
+  .dark #bottombar {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  
+
+
+
+}

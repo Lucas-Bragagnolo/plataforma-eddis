@@ -335,8 +335,22 @@ function updateUserData() {
       nombreUsuario.textContent = "";
       //console.log('[DEBUG] userData incompleto, no se renderiza nombre');
     }
-  } else {
-    //console.log('[DEBUG] No se encontró el elemento #nombreUsuario en el DOM');
+  }
+  // Actualizar bienvenida en inicioContent
+  if (userData) {
+    const bienvenidaNombre = document.getElementById('bienvenidaNombre');
+    const bienvenidaFotoPerfil = document.getElementById('bienvenidaFotoPerfil');
+    if (bienvenidaNombre) {
+      bienvenidaNombre.textContent = userData.nombre + " " + userData.apellido;
+    }
+    if (bienvenidaFotoPerfil) {
+      // Si hay foto personalizada, usarla, si no usar avatar por nombre
+      let fotoUrl = userData.fotoPerfil && userData.fotoPerfil.length > 0
+        ? userData.fotoPerfil
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.nombre + ' ' + userData.apellido)}&background=32417f&color=fff&size=96`;
+      bienvenidaFotoPerfil.src = fotoUrl;
+      bienvenidaFotoPerfil.alt = `Foto de perfil de ${userData.nombre} ${userData.apellido}`;
+    }
   }
   //console.log('[DEBUG] updateUserData completado');
 }
@@ -1791,40 +1805,45 @@ function mostrarDetallesCurso(curso) {
         const pagado = cert.pagado === 1;
         const disponible = cert.disponible === true;
         const notaValida = cert.nota && cert.nota > 0;
-        
+
         const statusIcon = pagado ? '✅' : '⏳';
         const statusText = pagado ? 'Disponible' : 'Pendiente de pago';
         const statusClass = pagado ? 'text-green-600' : 'text-yellow-600';
-        
-        const botonesHTML = disponible && pagado ? `
-          <div class="flex space-x-2 mt-3">
-            <button 
-              class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-              onclick="window.open('${cert.linkcertificado}', '_blank')"
-              aria-label="Imprimir certificado de ${cert.titulo}">
-              <i class="fa-solid fa-print text-sm"></i>
-              <span>Certificado</span>
-            </button>
-            <button 
-              class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-gray-700 hover:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
-              onclick="window.open('${cert.linkcredencial}', '_blank')"
-              aria-label="Imprimir credencial de ${cert.titulo}">
-              <i class="fa-solid fa-id-card text-sm"></i>
-              <span>Credencial</span>
-            </button>
-          </div>
-        ` : `
-          <div class="mt-3 text-sm font-medium ${statusClass}">
-            ${statusText}
-          </div>
-        `;
-        
+
+        // Solo mostrar el mensaje de estado una vez
+        let botonesHTML = '';
+        let statusHTML = '';
+        if (disponible && pagado) {
+          botonesHTML = `
+            <div class="flex space-x-2 mt-3">
+              <button 
+                class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                onclick="window.open('${cert.linkcertificado}', '_blank')"
+                aria-label="Imprimir certificado de ${cert.titulo}">
+                <i class="fa-solid fa-print text-sm"></i>
+                <span>Certificado</span>
+              </button>
+              <button 
+                class="certificate-mobile-button flex-1 flex items-center justify-center gap-2 text-white bg-gray-700 hover:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
+                onclick="window.open('${cert.linkcredencial}', '_blank')"
+                aria-label="Imprimir credencial de ${cert.titulo}">
+                <i class="fa-solid fa-id-card text-sm"></i>
+                <span>Credencial</span>
+              </button>
+            </div>
+          `;
+          statusHTML = `<div class="text-xs ${statusClass} mt-1 font-medium">${statusText}</div>`;
+        } else {
+          botonesHTML = '';
+          statusHTML = `<div class="mt-3 text-sm font-medium ${statusClass}">${statusText}</div>`;
+        }
+
         const notaHTML = notaValida
           ? `<div class="mt-2"><span class="certificate-grade-badge">Nota: ${cert.nota}</span></div>`
           : '';
-        
+
         const cardClass = pagado ? 'certificate-available' : 'certificate-pending';
-        
+
         return `
           <div class="certificate-mobile-card bg-gray-50 dark:bg-gray-800 rounded-lg p-3 ${cardClass}">
             <div class="flex items-start space-x-3">
@@ -1833,7 +1852,7 @@ function mostrarDetallesCurso(curso) {
                 <h5 class="text-sm font-medium text-gray-900 dark:text-text-dark truncate">${cert.titulo}</h5>
                 <p class="text-xs text-gray-500 dark:text-text-dark-secondary mt-1">${cert.tipo}</p>
                 ${notaHTML}
-                <div class="text-xs ${statusClass} mt-1 font-medium">${statusText}</div>
+                ${statusHTML}
                 ${botonesHTML}
               </div>
             </div>
