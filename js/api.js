@@ -142,7 +142,7 @@ class ApiService {
     const country = localStorage.getItem("selectedCountry");
     const token = this.getAuthToken();
     const params = new URLSearchParams({ pais: country, token }).toString();
-    // console.log(" Enviando a /alumnos/datos.php con GET:", params);
+     console.log(" Enviando a /alumnos/datos.php con GET:", params);
     return await this.makeRequest(`/alumnos/datos.php?${params}`, {
       method: "GET"
     });

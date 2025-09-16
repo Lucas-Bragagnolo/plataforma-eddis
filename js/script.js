@@ -335,32 +335,75 @@ function renderPublicaciones() {
 
   // Clear and set up the grid container
   grid.innerHTML = "";
-  grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(200px,auto)] w-full p-2";
+  
+  // Diferentes layouts para mobile y desktop
+  grid.className = "w-full p-2";
 
   publicacionesData.forEach((publicacion, index) => {
-    // Create card element
-    const card = document.createElement("article");
-    card.className = "group relative flex flex-col bg-white dark:bg-card-dark rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300";
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", publicacion.titulo);
+    // Vista estilo Instagram para mobile
+    const mobileCard = document.createElement("div");
+    mobileCard.className = "md:hidden mb-4 bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark rounded-lg overflow-hidden";
+    
+    mobileCard.innerHTML = `
+      <!-- Header del post -->
+      <div class="flex items-center p-3 border-b border-gray-100 dark:border-border-dark">
+        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <i class="fa-solid fa-graduation-cap text-white text-xs"></i>
+        </div>
+        <div class="ml-3">
+          <p class="font-semibold text-sm text-gray-900 dark:text-text-dark">Eddis Platform</p>
+          <p class="text-xs text-gray-500 dark:text-text-dark-secondary">${formatDate(publicacion.fechaPublicacion)}</p>
+        </div>
+      </div>
+      
+      <!-- Imagen principal -->
+      <div class="relative aspect-square">
+        <img src="${publicacion.imagenUrl || 'https://picsum.photos/400/400?random=' + publicacion.id}" 
+             alt="${publicacion.titulo}" 
+             class="w-full h-full object-cover">
+      </div>
+      
+      <!-- Contenido -->
+      <div class="p-3">
+        <!-- Título y descripción -->
+        <div>
+          <h3 class="font-semibold text-gray-900 dark:text-text-dark mb-1">
+            ${publicacion.titulo}
+          </h3>
+          <p class="text-gray-600 dark:text-text-dark-secondary text-sm leading-relaxed">
+            ${(publicacion.descripcion || 'Esta es una publicación importante.').substring(0, 100)}${(publicacion.descripcion || '').length > 100 ? '...' : ''}
+          </p>
+        </div>
+      </div>
+    `;
 
-    // Set grid positioning based on index
+    // Append mobile card
+    grid.appendChild(mobileCard);
+  });
+
+  // Crear un contenedor grid separado para desktop
+  const desktopGrid = document.createElement('div');
+  desktopGrid.className = "hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(200px,auto)]";
+  
+  // Crear las tarjetas desktop y agregarlas al grid
+  publicacionesData.forEach((publicacion, index) => {
+    const desktopCard = document.createElement("article");
+    desktopCard.className = "group relative flex flex-col bg-white dark:bg-card-dark rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer";
+    desktopCard.tabIndex = 0;
+    desktopCard.setAttribute("role", "button");
+    desktopCard.setAttribute("aria-label", publicacion.titulo);
+
+    // Set grid positioning based on index for desktop
     if (index === 0) {
-      // First post: 2x2 grid cell
-      card.classList.add("lg:col-span-2", "lg:row-span-2");
+      desktopCard.classList.add("lg:col-span-2", "lg:row-span-2");
     } else if (index === 1) {
-      // Second post: 2x1 grid cell, positioned to the right of first post
-      card.classList.add("lg:col-span-1", "lg:row-span-1");
+      desktopCard.classList.add("lg:col-span-1", "lg:row-span-1");
     } else if (index === 2) {
-      // Second post: 2x1 grid cell, positioned to the right of first post
-      card.classList.add("lg:col-span-1", "lg:row-span-2");
+      desktopCard.classList.add("lg:col-span-1", "lg:row-span-2");
     } else if (index === 3) {
-      // Second post: 2x1 grid cell, positioned to the right of first post
-      card.classList.add("lg:col-span-1", "lg:row-span-2");
+      desktopCard.classList.add("lg:col-span-1", "lg:row-span-2");
     } else {
-      // Remaining posts: 1x1 grid cells
-      card.classList.add("sm:col-span-1");
+      desktopCard.classList.add("sm:col-span-1");
     }
 
     // Handle image or placeholder
@@ -402,152 +445,163 @@ function renderPublicaciones() {
       </div>
     `;
 
-    // Combine all sections
-    card.innerHTML = `
+    // Combine all sections for desktop
+    desktopCard.innerHTML = `
       <div class="relative h-full">
         ${imageSection}
         ${contentSection}
       </div>
     `;
 
-    // Add click and keyboard interaction
-    card.addEventListener("click", () => {
-      mostrarDetallePublicacion(publicacion);
+    // Add click and keyboard interaction to desktop card
+    desktopCard.addEventListener("click", () => {
+      window.mostrarDetallePublicacion(publicacion);
     });
 
-    card.addEventListener("keydown", (e) => {
+    desktopCard.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        mostrarDetallePublicacion(publicacion);
+        window.mostrarDetallePublicacion(publicacion);
       }
     });
 
-    grid.appendChild(card);
-});
+    desktopGrid.appendChild(desktopCard);
+  });
+  
+  grid.appendChild(desktopGrid);
+}
 
-// Función para mostrar el detalle de una publicación
-function mostrarDetallePublicacion(publicacion) {
-  // Crear overlay y modal
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+// Función global para mostrar el detalle de una publicación
+window.mostrarDetallePublicacion = function(publicacion) {
+  console.log("Mostrando detalle de publicación:", publicacion);
   
-  const modal = document.createElement('div');
-  modal.className = 'bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all duration-500 scale-95 opacity-0';
+  // Ocultar el contenido principal de inicio
+  const inicioContent = document.getElementById('inicioContent');
+  if (inicioContent) {
+    inicioContent.style.display = 'none';
+  }
   
-  // Contenido del modal
-  modal.innerHTML = `
-    <div class="relative">
-      <!-- Header con botón de cerrar -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Detalles de la Publicación</h2>
-        <button class="close-modal p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
-          <i class="fa-solid fa-xmark text-xl text-gray-500 dark:text-gray-400"></i>
-        </button>
+  // Crear o obtener el contenedor de detalle
+  let detalleContainer = document.getElementById('publicacionDetalle');
+  if (!detalleContainer) {
+    detalleContainer = document.createElement('div');
+    detalleContainer.id = 'publicacionDetalle';
+    detalleContainer.className = 'tab-content';
+    
+    // Insertar después del contenido de inicio
+    const main = document.querySelector('main');
+    main.appendChild(detalleContainer);
+  }
+  
+  // Vista para Desktop (sin navegación)
+  detalleContainer.innerHTML = `
+    <!-- Vista Desktop -->
+    <div class="hidden md:block">
+      <!-- Header simple -->
+      <div class="bg-white dark:bg-card-dark shadow-sm border-b border-gray-200 dark:border-border-dark p-4 mb-6">
+        <div class="flex items-center justify-between max-w-6xl mx-auto">
+          <button onclick="window.volverAPublicaciones()" class="flex items-center space-x-2 text-gray-600 dark:text-text-dark hover:text-gray-900 dark:hover:text-text-dark transition-colors">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver a Novedades</span>
+          </button>
+        </div>
       </div>
       
-      <!-- Contenido principal -->
-      <div class="p-6 overflow-y-auto max-h-[70vh]">
-        <!-- Imagen o placeholder -->
-        <div class="mb-6 rounded-xl overflow-hidden">
-          ${publicacion.imagenUrl && publicacion.imagenUrl.trim() !== '' ? 
-            `<img src="${publicacion.imagenUrl}" alt="${publicacion.titulo}" class="w-full h-64 object-cover">` :
-            `<div class="w-full h-64 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-              <i class="fa-solid fa-image text-6xl text-white opacity-60"></i>
-            </div>`
-          }
-        </div>
-        
-        <!-- Información de la publicación -->
-        <div class="space-y-4">
-          <div>
-            <span class="text-sm text-gray-500 dark:text-gray-400">
-              ${formatDate(publicacion.fechaPublicacion)}
-            </span>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-1">
-              ${publicacion.titulo}
-            </h1>
+      <!-- Contenido principal desktop -->
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Imagen -->
+          <div class="relative">
+            <img src="${publicacion.imagenUrl || 'https://picsum.photos/600/400?random=' + publicacion.id}" 
+                 alt="${publicacion.titulo}" 
+                 class="w-full h-96 object-cover rounded-lg shadow-lg">
           </div>
           
-          ${publicacion.descripcion ? `
+          <!-- Contenido -->
+          <div class="space-y-6">
+            <div>
+              <span class="text-sm text-gray-500 dark:text-text-dark-secondary">
+                ${formatDate(publicacion.fechaPublicacion)}
+              </span>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-text-dark mt-2">
+                ${publicacion.titulo}
+              </h1>
+            </div>
+            
             <div class="prose dark:prose-invert max-w-none">
-              <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                ${publicacion.descripcion}
+              <p class="text-gray-600 dark:text-text-dark-secondary leading-relaxed text-lg">
+                ${publicacion.descripcion || 'Esta es una publicación importante que contiene información relevante para todos nuestros estudiantes. Manténganse informados de las últimas novedades y actualizaciones de nuestra institución. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}
               </p>
             </div>
-          ` : ''}
-          
-          <!-- Información adicional (si existe) -->
-          ${publicacion.contenido ? `
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-              <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Contenido adicional:</h3>
-              <p class="text-gray-600 dark:text-gray-300">${publicacion.contenido}</p>
-            </div>
-          ` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Vista Mobile (estilo Instagram) -->
+    <div class="md:hidden">
+      <!-- Header mobile -->
+      <div class="bg-white dark:bg-card-dark border-b border-gray-200 dark:border-border-dark p-3 sticky top-0 z-10">
+        <div class="flex items-center justify-between">
+          <button onclick="window.volverAPublicaciones()" class="p-2 -ml-2 text-gray-600 dark:text-text-dark">
+            <i class="fa-solid fa-arrow-left text-xl"></i>
+          </button>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-text-dark">Novedad</h2>
+          <div class="w-10"></div>
         </div>
       </div>
       
-      <!-- Footer con acciones -->
-      <div class="border-t border-gray-200 dark:border-gray-700 p-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <button class="action-btn bg-blue-600 hover:bg-blue-700 text-white">
-              <i class="fa-solid fa-download mr-2"></i>
-              Descargar
-            </button>
-            <button class="action-btn bg-gray-600 hover:bg-gray-700 text-white">
-              <i class="fa-solid fa-share mr-2"></i>
-              Compartir
-            </button>
+      <!-- Contenido mobile -->
+      <div class="bg-white dark:bg-card-dark">
+        <!-- Imagen -->
+        <div class="relative">
+          <img src="${publicacion.imagenUrl || 'https://picsum.photos/400/400?random=' + publicacion.id}" 
+               alt="${publicacion.titulo}" 
+               class="w-full aspect-square object-cover">
+        </div>
+        
+        <!-- Información -->
+        <div class="p-4">
+          <!-- Título -->
+          <h2 class="font-semibold text-gray-900 dark:text-text-dark mb-2">
+            ${publicacion.titulo}
+          </h2>
+          
+          <!-- Descripción con "Ver más" -->
+          <div>
+            <p id="descripcionCorta" class="text-gray-600 dark:text-text-dark-secondary leading-relaxed">
+              ${(publicacion.descripcion || 'Esta es una publicación importante que contiene información relevante para todos nuestros estudiantes. Manténganse informados de las últimas novedades y actualizaciones de nuestra institución.').substring(0, 150)}${(publicacion.descripcion || '').length > 150 ? '...' : ''}
+            </p>
+            
+            ${(publicacion.descripcion || '').length > 150 ? `
+              <p id="descripcionCompleta" class="text-gray-600 dark:text-text-dark-secondary leading-relaxed hidden">
+                ${publicacion.descripcion || 'Esta es una publicación importante que contiene información relevante para todos nuestros estudiantes. Manténganse informados de las últimas novedades y actualizaciones de nuestra institución.'}
+              </p>
+              
+              <button id="verMasBtn" onclick="window.toggleDescripcion()" class="text-gray-500 dark:text-text-dark-secondary text-sm mt-1">
+                ver más
+              </button>
+              
+              <button id="verMenosBtn" onclick="window.toggleDescripcion()" class="text-gray-500 dark:text-text-dark-secondary text-sm mt-1 hidden">
+                ver menos
+              </button>
+            ` : ''}
           </div>
-          <button class="back-btn bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-4 py-2 rounded-lg transition-colors">
-            <i class="fa-solid fa-arrow-left mr-2"></i>
-            Volver atrás
-          </button>
+          
+          <!-- Fecha -->
+          <div class="mt-3 pt-3 border-t border-gray-100 dark:border-border-dark">
+            <span class="text-xs text-gray-400 dark:text-text-dark-secondary uppercase tracking-wide">
+              ${formatDate(publicacion.fechaPublicacion)}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   `;
   
-  // Agregar al DOM
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-  
-  // Animación de entrada
-  setTimeout(() => {
-    modal.classList.remove('scale-95', 'opacity-0');
-    modal.classList.add('scale-100', 'opacity-100');
-  }, 10);
-  
-  // Event listeners
-  const closeBtn = modal.querySelector('.close-modal');
-  const backBtn = modal.querySelector('.back-btn');
-  
-  const closeModal = () => {
-    modal.classList.add('scale-95', 'opacity-0');
-    setTimeout(() => {
-      overlay.remove();
-    }, 300);
-  };
-  
-  closeBtn.addEventListener('click', closeModal);
-  backBtn.addEventListener('click', closeModal);
-  
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      closeModal();
-    }
-  });
-  
-  // Cerrar con ESC
-  const handleEscape = (e) => {
-    if (e.key === 'Escape') {
-      closeModal();
-      document.removeEventListener('keydown', handleEscape);
-    }
-  };
-  
-  document.addEventListener('keydown', handleEscape);
-}
+  // Mostrar el detalle
+  detalleContainer.classList.remove('hidden');
+  detalleContainer.style.display = 'block';
 }
 
 // Enhanced tab switching functionality
@@ -674,3 +728,107 @@ if (verCuentaCorrienteBtnMobile) {
     if (paymentCard) paymentCard.classList.add("hidden");
   });
 }
+
+// Funciones globales para el detalle de publicaciones
+window.volverAPublicaciones = function() {
+  const detalleContainer = document.getElementById('publicacionDetalle');
+  const inicioContent = document.getElementById('inicioContent');
+  
+  if (detalleContainer) {
+    detalleContainer.style.display = 'none';
+  }
+  
+  if (inicioContent) {
+    inicioContent.style.display = 'block';
+  }
+}
+
+window.toggleDescripcion = function() {
+  const descripcionCorta = document.getElementById('descripcionCorta');
+  const descripcionCompleta = document.getElementById('descripcionCompleta');
+  const verMasBtn = document.getElementById('verMasBtn');
+  const verMenosBtn = document.getElementById('verMenosBtn');
+  
+  if (descripcionCorta && descripcionCompleta && verMasBtn && verMenosBtn) {
+    if (descripcionCompleta.classList.contains('hidden')) {
+      // Mostrar descripción completa
+      descripcionCorta.classList.add('hidden');
+      descripcionCompleta.classList.remove('hidden');
+      verMasBtn.classList.add('hidden');
+      verMenosBtn.classList.remove('hidden');
+    } else {
+      // Mostrar descripción corta
+      descripcionCorta.classList.remove('hidden');
+      descripcionCompleta.classList.add('hidden');
+      verMasBtn.classList.remove('hidden');
+      verMenosBtn.classList.add('hidden');
+    }
+  }
+}
+
+// Función para abrir el campus virtual con reintentos
+function abrirCampus() {
+  console.log('[DEBUG] Intentando abrir campus virtual');
+  console.log('[DEBUG] window.userData:', window.userData);
+  console.log('[DEBUG] typeof window.userData:', typeof window.userData);
+  console.log('[DEBUG] window.userData.logincampus:', window.userData?.logincampus);
+  
+  // Verificar si tenemos los datos del usuario y el link del campus
+  if (window.userData && window.userData.logincampus) {
+    console.log('[DEBUG] Abriendo campus:', window.userData.logincampus);
+    // Abrir el campus en una nueva pestaña
+    window.open(window.userData.logincampus, '_blank');
+  } else {
+    console.warn('[WARNING] No se encontró link del campus, reintentando...');
+    console.warn('[WARNING] window.userData:', window.userData);
+    console.warn('[WARNING] logincampus:', window.userData?.logincampus);
+    
+    // Reintentar después de un breve delay para dar tiempo a que se carguen los datos
+    setTimeout(() => {
+      if (window.userData && window.userData.logincampus) {
+        console.log('[DEBUG] Reintento exitoso, abriendo campus:', window.userData.logincampus);
+        window.open(window.userData.logincampus, '_blank');
+      } else {
+        console.error('[ERROR] Datos aún no disponibles después del reintento');
+        // Si aún no tenemos el link, mostrar un mensaje de error
+        if (typeof showToast !== 'undefined') {
+          showToast('No se pudo obtener el enlace del campus. Asegúrate de que los datos estén cargados.', 'error');
+        } else {
+          alert('No se pudo obtener el enlace del campus. Asegúrate de que los datos estén cargados.');
+        }
+      }
+    }, 1000); // Esperar 1 segundo
+  }
+}
+
+// Event listeners para los botones de campus
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('[DEBUG] Configurando event listeners para campus');
+  console.log('[DEBUG] window.userData en DOMContentLoaded:', window.userData);
+  
+  // Botón de campus en desktop (sidebar)
+  const campusDesktopBtn = document.getElementById('campusDesktopBtn');
+  if (campusDesktopBtn) {
+    campusDesktopBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('[DEBUG] Click en campus desktop, userData actual:', window.userData);
+      abrirCampus();
+    });
+    console.log('[DEBUG] Event listener configurado para campus desktop');
+  } else {
+    console.warn('[WARNING] No se encontró el botón campusDesktopBtn');
+  }
+
+  // Botón de campus en mobile (bottom bar)
+  const campusMobileBtn = document.getElementById('campusMobileBtn');
+  if (campusMobileBtn) {
+    campusMobileBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('[DEBUG] Click en campus mobile, userData actual:', window.userData);
+      abrirCampus();
+    });
+    console.log('[DEBUG] Event listener configurado para campus mobile');
+  } else {
+    console.warn('[WARNING] No se encontró el botón campusMobileBtn');
+  }
+});

@@ -9,9 +9,8 @@ window.addEventListener('DOMContentLoaded', function () {
       if (tabName) {
         const tab = document.querySelector(`[data-tab="${tabName}"]`);
         if (tab) tab.click();
-      } else if (btn.id === 'irSitioWeb') {
-        // Acción personalizada para Campus
-        // window.open('https://campus.eddis.com', '_blank');
+      } else if (btn.id === 'campusMobileBtn') {
+        // El evento se maneja en script.js con abrirCampus()
       } else if (btn.id === 'cerrarSesionBtn') {
         const tab = document.querySelector('[data-tab="tab-configuracion"]');
         if (tab) tab.click();

@@ -170,7 +170,8 @@ function mostrarEstadoVacio() {
 }
 
 // Variables globales
-let userData = {}
+window.userData = {};
+console.log('[DEBUG] window.userData inicializada:', window.userData);
 let coursesData = {}
 let paymentsData = []
 
@@ -249,18 +250,18 @@ async function initializeDashboard() {
   //console.log('[DEBUG] Tab mostrado');
 
   try {
-    //console.log('[DEBUG] Llamando a loadUserDataFromAPI');
+    console.log('[DEBUG] Llamando a loadUserDataFromAPI');
     await loadUserDataFromAPI();
-    //    console.log('[DEBUG] loadUserDataFromAPI completado');
+        console.log('[DEBUG] loadUserDataFromAPI completado');
   } catch (error) {
-    //console.error('[ERROR] Error en initializeDashboard:', error);
+    console.error('[ERROR] Error en initializeDashboard:', error);
     throw error;
   }
 }
 
 // Load user data from API
 async function loadUserDataFromAPI() {
-  //console.log('[DEBUG] Entrando a loadUserDataFromAPI');
+  console.log('[DEBUG] Entrando a loadUserDataFromAPI');
   const entidad = localStorage.getItem('lastLoginCountry');
   const currentCountry = apiService.getCurrentCountry();
   const countryInfo = COUNTRIES[currentCountry];
@@ -269,25 +270,44 @@ async function loadUserDataFromAPI() {
     //console.log('[DEBUG] Mostrando toast de carga');
     showToast(`Cargando datos desde ${entidad}...`, "info");
 
-    //console.log('[DEBUG] Llamando a getAlumnoData');
+    console.log('[DEBUG] Llamando a getAlumnoData');
     const response = await apiService.getAlumnoData();
-    //console.log('[DEBUG] Respuesta de getAlumnoData:', response);
+    console.log('[DEBUG] Respuesta de getAlumnoData:', response);
 
     if (response.success) {
       // Update global data
-      userData = response;
-      // userData.fechaini = response.fechaini;
-      //console.log('[DEBUG] Actualizando datos de usuario:', userData);
-      //console.log('[DEBUG] Llamando a poblarSelectorCursos');
+      window.userData = response;
+      window.userData.fechaini = response.fechaini;
+      console.log('[DEBUG] Actualizando datos de usuario:', window.userData);
+      console.log('[DEBUG] logincampus asignado:', window.userData.logincampus);
+      console.log('[DEBUG] Llamando a poblarSelectorCursos');
       poblarSelectorCursos(response.cursos);
-      //console.log('[DEBUG] poblarSelectorCursos completado');
+      console.log('[DEBUG] poblarSelectorCursos completado');
 
       updateUserInterface();
-      //console.log('[DEBUG] UI actualizada');
+      console.log('[DEBUG] UI actualizada');
 
       showToast(`Datos cargados correctamente`, "success");
+      const botonCampus = document.getElementById('campusDesktopBtn');
+
+      if (botonCampus) {
+        botonCampus.addEventListener('click', () => {
+          console.log('[DEBUG] Click en campus desktop, userData actual:', window.userData);
+          abrirCampus();
+        });
+      }
+
+      const botonCampusMobile = document.getElementById('campusMobileBtn');
+      if (botonCampusMobile) {
+        botonCampusMobile.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('[DEBUG] Click en campus mobile, userData actual:', window.userData);
+          abrirCampus();
+        });
+      }
+
     } else {
-      //console.error('[ERROR] Respuesta sin success:', response);
+      console.error('[ERROR] Respuesta sin success:', response);
       throw new Error(response.message || "Error al cargar los datos");
     }
   } catch (error) {
@@ -328,28 +348,28 @@ function updateUserData() {
   const nombreUsuario = document.getElementById("nombreUsuario");
   //console.log('[DEBUG] updateUserData userData:', userData);
   if (nombreUsuario) {
-    if (userData) {
-      nombreUsuario.textContent = userData.nombre + " " + userData.apellido;
-      //console.log('[DEBUG] Renderizado en #nombreUsuario:', userData);
+    if (window.userData) {
+      nombreUsuario.textContent = window.userData.nombre + " " + window.userData.apellido;
+      //console.log('[DEBUG] Renderizado en #nombreUsuario:', window.userData);
     } else {
       nombreUsuario.textContent = "";
       //console.log('[DEBUG] userData incompleto, no se renderiza nombre');
     }
   }
   // Actualizar bienvenida en inicioContent
-  if (userData) {
+  if (window.userData) {
     const bienvenidaNombre = document.getElementById('bienvenidaNombre');
     const bienvenidaFotoPerfil = document.getElementById('bienvenidaFotoPerfil');
     if (bienvenidaNombre) {
-      bienvenidaNombre.textContent = userData.nombre + " " + userData.apellido;
+      bienvenidaNombre.textContent = window.userData.nombre + " " + window.userData.apellido;
     }
     if (bienvenidaFotoPerfil) {
       // Si hay foto personalizada, usarla, si no usar avatar por nombre
-      let fotoUrl = userData.fotoPerfil && userData.fotoPerfil.length > 0
-        ? userData.fotoPerfil
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.nombre + ' ' + userData.apellido)}&background=32417f&color=fff&size=96`;
+      let fotoUrl = window.userData.fotoPerfil && window.userData.fotoPerfil.length > 0
+        ? window.userData.fotoPerfil
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(window.userData.nombre + ' ' + window.userData.apellido)}&background=32417f&color=fff&size=96`;
       bienvenidaFotoPerfil.src = fotoUrl;
-      bienvenidaFotoPerfil.alt = `Foto de perfil de ${userData.nombre} ${userData.apellido}`;
+      bienvenidaFotoPerfil.alt = `Foto de perfil de ${window.userData.nombre} ${window.userData.apellido}`;
     }
   }
   //console.log('[DEBUG] updateUserData completado');
@@ -361,12 +381,12 @@ function updateUserProfile() {
   const countryInfo = COUNTRIES[currentCountry]
 
   const elements = {
-    nombreUsuario: `${userData.nombre} ${userData.apellido}`,
-    userNombre: `${userData.nombre} ${userData.apellido}`,
-    userEmail: userData.email,
-    userLegajo: userData.legajo,
-    userDocumento: userData.documento,
-    miembroDesde: `Miembro desde: ${userData.fechaingreso}`,
+    nombreUsuario: `${window.userData.nombre} ${window.userData.apellido}`,
+    userNombre: `${window.userData.nombre} ${window.userData.apellido}`,
+    userEmail: window.userData.email,
+    userLegajo: window.userData.legajo,
+    userDocumento: window.userData.documento,
+    miembroDesde: `Miembro desde: ${window.userData.fechaingreso}`,
   }
 
   Object.entries(elements).forEach(([id, value]) => {
@@ -767,8 +787,11 @@ function mostrarDetallesCurso(curso) {
   // Calcular valores
   const clasesHechas = parseInt(curso.claseshechas) || 0;
   const clasesTotales = parseInt(curso.clasestotales) || 0;
-  const asistencia = clasesTotales > 0 ? Math.round((clasesHechas / clasesTotales) * 100) : 0;
   const avance = parseInt(curso.avance) || 0;
+  // Clases dictadas según avance
+  const clasesDictadas = clasesTotales > 0 ? Math.round((avance / 100) * clasesTotales) : 0;
+  // Asistencia: % de clases asistidas sobre las dictadas
+  const asistencia = clasesDictadas > 0 ? Math.round((clasesHechas / clasesDictadas) * 100) : 0;
 
   // Actualizar progreso circular - Desktop
   if (progressCircle && progressPercentage) {
@@ -850,12 +873,26 @@ function mostrarDetallesCurso(curso) {
   // Actualizar elementos de asistencia - Desktop
   if (attendancePercentage) attendancePercentage.textContent = `${asistencia}%`;
   if (attendedClasses) attendedClasses.textContent = clasesHechas;
-  if (totalClasses) totalClasses.textContent = clasesTotales;
+  if (totalClasses) totalClasses.textContent = clasesDictadas; // Mostrar clases dictadas
+
+  // Mostrar el total de clases del curso (no dictadas, sino el total)
+  const totalClasesCurso = document.getElementById('totalClasesCurso');
+  if (totalClasesCurso) {
+    totalClasesCurso.textContent = `Total de clases del curso: ${clasesTotales}`;
+    totalClasesCurso.classList.remove('hidden');
+  }
 
   // Actualizar elementos de asistencia - Mobile
   if (attendancePercentageMobile) attendancePercentageMobile.textContent = `${asistencia}%`;
   if (attendedClassesMobile) attendedClassesMobile.textContent = clasesHechas;
-  if (totalClassesMobile) totalClassesMobile.textContent = clasesTotales;
+  if (totalClassesMobile) totalClassesMobile.textContent = clasesDictadas; // Mostrar clases dictadas
+
+  // Mostrar el total de clases del curso en mobile
+  const totalClasesCursoMobile = document.getElementById('totalClasesCursoMobile');
+  if (totalClasesCursoMobile) {
+    totalClasesCursoMobile.textContent = `Total de clases del curso: ${clasesTotales}`;
+    totalClasesCursoMobile.classList.remove('hidden');
+  }
 
   // Función para actualizar barra de asistencia
   const updateAttendanceBar = (bar, height = 'h-2') => {
@@ -1109,7 +1146,6 @@ function mostrarDetallesCurso(curso) {
         // Mensaje explicativo móvil
         if (examFeeMessageMobile) {
           let mensajeMobile = '';
-          
           if (examenPagado) {
             mensajeMobile = '<div class="text-green-600"><i class="fa-solid fa-check-circle mr-1"></i>Derecho de examen abonado correctamente</div>';
           } else if (todasCuotasPagadas) {
@@ -1118,7 +1154,6 @@ function mostrarDetallesCurso(curso) {
             const mensajePendientes = cuotasPendientes.length === 1
               ? `Tienes 1 cuota pendiente de pago`
               : `Tienes ${cuotasPendientes.length} cuotas pendientes de pago`;
-            
             mensajeMobile = `
               <div class="text-red-600">
                 <i class="fa-solid fa-lock mr-1"></i>
@@ -1130,8 +1165,12 @@ function mostrarDetallesCurso(curso) {
               </div>
             `;
           }
-          
           examFeeMessageMobile.innerHTML = mensajeMobile;
+          // Actualizar también el mensaje en desktop
+          const examFeeMessageDesktop = document.getElementById('examFeeMessageDesktop');
+          if (examFeeMessageDesktop) {                   
+            examFeeMessageDesktop.innerHTML = mensajeMobile;
+          }
         }
       }
 
@@ -1211,23 +1250,24 @@ function mostrarDetallesCurso(curso) {
 
           // Configurar evento de click
           const handleExamFeePayment = () => {
-            const confirmacion = confirm(`¿Confirmas el pago del derecho de examen por $${parseFloat(cuotaExamen.importe).toLocaleString('es-AR', { minimumFractionDigits: 2 })}?`);
 
-            if (confirmacion) {
-              showToast("Redirigiendo al sistema de pagos...", "info");
-
-              // Aquí integrarías con tu sistema de pagos real
-              console.log('[DERECHO EXAMEN] Iniciando pago:', {
-                cuota: cuotaExamen.cuota,
-                importe: cuotaExamen.importe,
-                mes: cuotaExamen.mes
-              });
-
-              // Simulación temporal (remover en producción)
-              setTimeout(() => {
-                showToast("Pago procesado correctamente", "success");
-              }, 2000);
-            }
+              // Verificar si existe el link de pago
+              if (cuotaExamen.linkpago && cuotaExamen.linkpago.data && cuotaExamen.linkpago.data.link) {
+                showToast("Redirigiendo al sistema de pagos...", "info");
+                
+                // Abrir el link de pago en una nueva ventana
+                window.open(cuotaExamen.linkpago.data.link, '_blank');
+                
+                console.log('[DERECHO EXAMEN] Redirigiendo a pago:', {
+                  cuota: cuotaExamen.cuota,
+                  importe: cuotaExamen.importe,
+                  mes: cuotaExamen.mes,
+                  linkPago: cuotaExamen.linkpago.data.link
+                });
+              } else {
+                showToast("Error: Link de pago no disponible", "error");
+                console.error('[DERECHO EXAMEN] Link de pago no encontrado:', cuotaExamen);
+              }            
           };
 
           payExamFeeButton.onclick = handleExamFeePayment;
@@ -1682,6 +1722,22 @@ function mostrarDetallesCurso(curso) {
     }
   }
 
+  // Configurar botón de impresión de constancia de alumno regular
+  const printConstancyBtn = document.getElementById('printConstancyBtn');
+  if (printConstancyBtn) {
+    if (curso.certificado_regular) {
+      printConstancyBtn.onclick = () => {
+        window.open(curso.certificado_regular, '_blank');
+      };
+      printConstancyBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      printConstancyBtn.title = 'Imprimir constancia de alumno regular';
+    } else {
+      printConstancyBtn.onclick = null;
+      printConstancyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      printConstancyBtn.title = 'Constancia no disponible';
+    }
+  }
+
   // Actualizar certificados
   if (curso.certificados && Array.isArray(curso.certificados)) {
     const certificateContent = document.getElementById('certificateContent');
@@ -1889,26 +1945,22 @@ function mostrarDetallesCurso(curso) {
   }
 
   function pagarCuotaExamen(cuota) {
-    const confirmacion = confirm(`¿Deseas proceder con el pago del derecho de examen por $${cuota.importe}?`)
-
-    if (confirmacion) {
-      // Mostrar mensaje de procesamiento
-      window.showToast("Redirigiendo al sistema de pagos...", "info")
-
-      // Aquí puedes integrar con tu sistema de pagos real
-      // Ejemplo: window.location.href = `https://tu-sistema-pagos.com/pagar?cuota=99&monto=${cuota.importe}`;
-
-      console.log("[v0] Iniciando pago para cuota 99:", {
-        cuota: cuota.cuota,
-        importe: cuota.importe,
-        mes: cuota.mes,
-      })
-
-      // Simulación de éxito (remover en producción)
-      setTimeout(() => {
-        window.showToast("Pago procesado correctamente", "success")
-      }, 2000)
-    }
+    
+      // Verificar si existe el link de pago
+      if (cuota.linkpago && cuota.linkpago.data && cuota.linkpago.data.link) {                
+        // Abrir el link de pago en una nueva ventana
+        window.open(cuota.linkpago.data.link, '_blank');        
+        console.log('[DERECHO EXAMEN] Redirigiendo a pago:', {
+          cuota: cuota.cuota,
+          importe: cuota.importe,
+          mes: cuota.mes,
+          linkPago: cuota.linkpago.data.link
+        });
+      } else {
+        showToast("Error: Link de pago no disponible", "error");
+        console.error('[DERECHO EXAMEN] Link de pago no encontrado:', cuota);
+      }
+    
   }
 
   // Función para manejar el menú desplegable
