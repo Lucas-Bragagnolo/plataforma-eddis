@@ -5,6 +5,27 @@
 .text-text-dark-secondary {
   color: #cbd5e1 !important;
 }
+
+/* Clases utilitarias para line-clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mejora para transiciones suaves */
+.transition-shadow {
+  transition: box-shadow 0.15s ease-in-out;
+}
+
 /* Responsive Sidebar y Bottom Bar */
 @media (max-width: 768px) {
   #sidebar {
@@ -89,13 +110,8 @@
 @media (min-width: 769px) {
   .main-content {
     transition: margin-left 0.2s;
-    margin-left: 5rem;
-    /* ancho colapsado por defecto (ahora 5rem) */
-  }
-
-  .sidebar-collapsed:hover~.main-content {
     margin-left: 16rem;
-    /* ancho expandido al hacer hover */
+    /* ancho expandido permanente */
   }
 
   #bottombar {
@@ -107,45 +123,30 @@
   }
 
   .sidebar-collapsed {
-    width: 5rem;
-    transition: width 0.2s;
-    overflow: hidden;
-  }
-
-  .sidebar-collapsed:hover {
     width: 16rem;
+    /* ancho expandido permanente */
+    transition: width 0.2s;
+    overflow: visible;
   }
 
   .sidebar-collapsed .menu-text {
-    opacity: 0;
+    opacity: 1;
+    /* siempre visible */
     transition: opacity 0.2s;
     white-space: nowrap;
   }
 
-  .sidebar-collapsed:hover .menu-text {
-    opacity: 1;
-    transition: opacity 0.2s 0.1s;
-  }
-
-  /* Oculta el nombre de usuario por defecto y lo muestra solo en hover */
+  /* Muestra el nombre de usuario siempre */
   #nombreUsuario {
-    display: none;
-  }
-
-  .sidebar-collapsed:hover #nombreUsuario {
     display: block;
   }
 
-  /* Oculta la leyenda 'Alumno' por defecto y la muestra solo en hover */
+  /* Muestra la leyenda 'Alumno' siempre */
   #userInfo .text-xs {
-    display: none;
-  }
-
-  .sidebar-collapsed:hover #userInfo .text-xs {
     display: block;
   }
 
-  /* Asegúrate de que los íconos estén centrados cuando colapsado */
+  /* Asegúrate de que los íconos estén alineados correctamente */
   .sidebar-collapsed .menu-item {
     display: flex;
     align-items: center;

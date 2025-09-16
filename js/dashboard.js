@@ -1024,7 +1024,7 @@ function mostrarDetallesCurso(curso) {
       if (!verCuentaBtn) {
         verCuentaBtn = document.createElement('button');
         verCuentaBtn.id = 'verCuentaCorrienteBtn';
-        verCuentaBtn.className = 'mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
+        verCuentaBtn.className = 'mt-4 w-full bg-blue-800 hover:bg-blue-800 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200';
         verCuentaBtn.innerHTML = '<i class="fa-solid fa-list mr-2"></i>Ver cuenta corriente';
         payButton.parentElement.appendChild(verCuentaBtn);
       }

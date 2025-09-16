@@ -1,50 +1,104 @@
 // [DEBUG] script.js cargado correctamente
 
-// Mock data para publicaciones de inicio
-const publicacionesData = [
-  {
-    id: 1,
-    titulo: "Nuevos cursos disponibles para 2024",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-15",
-  },
-  {
-    id: 2,
-    titulo: "Certificaciones internacionales",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-10",
-  },
-  {
-    id: 3,
-    titulo: "Plataforma renovada",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-08",
-  },
-  {
-    id: 4,
-    titulo: "Becas y descuentos especiales",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-05",
-  },
-  {
-    id: 5,
-    titulo: "Eventos y webinars gratuitos",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-03",
-  },
-  {
-    id: 6,
-    titulo: "Historias de éxito de alumnos",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-01",
-  },
-  {
-    id: 7,
-    titulo: "Nueva alianza internacional",
-    imagenUrl: "",
-    fechaPublicacion: "2024-01-20",
+// Variable global para almacenar las publicaciones desde la API
+let publicacionesData = []
+
+// Función para cargar publicaciones desde la API
+async function cargarPublicaciones() {
+  const grid = document.getElementById("publicacionesGrid");
+  if (!grid) return;
+  
+  // Mostrar loading state
+  mostrarLoadingPublicaciones();
+  
+  try {
+    console.log('[DEBUG] Cargando publicaciones desde la API...');
+    
+    // Importar el apiService dinámicamente
+    const { apiService } = await import('./api.js');
+    
+    const response = await apiService.getNovedadesData();
+    console.log('[DEBUG] Respuesta de novedades API:', response);
+    
+    if (response.success) {
+      // Convertir el objeto de respuesta a un array
+      const publicacionesArray = Object.values(response).filter(item => item.id);
+      
+      // Mapear los datos de la API al formato esperado
+      publicacionesData = publicacionesArray.map(item => ({
+        id: parseInt(item.id),
+        titulo: item.titulo,
+        descripcion: item.descripcion,
+        fechaPublicacion: item.fecha,
+        imagenUrl: item.portada,
+        imagenCabecera: item.cabecera,
+        orden: parseInt(item.orden),
+        vigenciaini: item.vigenciaini,
+        vigenciafin: item.vigenciafin
+      }));
+      
+      // Ordenar por orden si está disponible
+      publicacionesData.sort((a, b) => a.orden - b.orden);
+      
+      console.log('[DEBUG] Publicaciones procesadas:', publicacionesData);
+      
+      // Renderizar las publicaciones
+      renderPublicaciones();
+      
+    } else {
+      console.error('[ERROR] Error al cargar publicaciones:', response);
+      // Fallback a datos mock en caso de error
+      usarDatosMock();
+    }
+    
+  } catch (error) {
+    console.error('[ERROR] Error en cargarPublicaciones:', error);
+    // Fallback a datos mock en caso de error
+    usarDatosMock();
   }
-] 
+}
+
+// Función para mostrar estado de loading
+function mostrarLoadingPublicaciones() {
+  const grid = document.getElementById("publicacionesGrid");
+  if (!grid) return;
+  
+  grid.innerHTML = `
+    <div class="col-span-full flex flex-col items-center justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary-darkmode border-t-transparent mb-4"></div>
+      <p class="text-gray-600 dark:text-text-dark-secondary">Cargando novedades...</p>
+    </div>
+  `;
+}
+
+// Función fallback con datos mock
+function usarDatosMock() {
+  console.log('[DEBUG] Usando datos mock como fallback');
+  publicacionesData = [
+    {
+      id: 1,
+      titulo: "Nuevos cursos disponibles para 2024",
+      descripcion: "Descubre nuestra nueva oferta educativa con cursos actualizados y certificaciones reconocidas internacionalmente.",
+      imagenUrl: "https://picsum.photos/400/400?random=1",
+      fechaPublicacion: "2024-01-15",
+    },
+    {
+      id: 2,
+      titulo: "Certificaciones internacionales",
+      descripcion: "Obtén certificaciones reconocidas mundialmente que impulsen tu carrera profesional.",
+      imagenUrl: "https://picsum.photos/400/400?random=2",
+      fechaPublicacion: "2024-01-10",
+    },
+    {
+      id: 3,
+      titulo: "Plataforma renovada",
+      descripcion: "Experimenta nuestra nueva plataforma con mejor diseño, funcionalidades mejoradas y mayor accesibilidad.",
+      imagenUrl: "https://picsum.photos/400/400?random=3",
+      fechaPublicacion: "2024-01-08",
+    }
+  ];
+  renderPublicaciones();
+} 
 
 // DOM elements
 const courseSelector = document.getElementById("courseSelector")
@@ -336,139 +390,52 @@ function renderPublicaciones() {
   // Clear and set up the grid container
   grid.innerHTML = "";
   
-  // Diferentes layouts para mobile y desktop
-  grid.className = "w-full p-2";
+  // Usar un solo estilo unificado (estilo Instagram) para mobile y desktop
+  grid.className = "w-full p-2 space-y-4";
 
   publicacionesData.forEach((publicacion, index) => {
-    // Vista estilo Instagram para mobile
-    const mobileCard = document.createElement("div");
-    mobileCard.className = "md:hidden mb-4 bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark rounded-lg overflow-hidden";
+    // Crear tarjeta estilo Instagram unificada
+    const instagramCard = document.createElement("div");
+    instagramCard.className = "bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark overflow-hidden transition-shadow";
     
-    mobileCard.innerHTML = `
+    instagramCard.innerHTML = `
       <!-- Header del post -->
       <div class="flex items-center p-3 border-b border-gray-100 dark:border-border-dark">
         <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
           <i class="fa-solid fa-graduation-cap text-white text-xs"></i>
         </div>
         <div class="ml-3">
-          <p class="font-semibold text-sm text-gray-900 dark:text-text-dark">Eddis Platform</p>
+          <p class="font-semibold text-sm text-gray-900 dark:text-text-dark">Eddis Educativa</p>
           <p class="text-xs text-gray-500 dark:text-text-dark-secondary">${formatDate(publicacion.fechaPublicacion)}</p>
         </div>
       </div>
       
-      <!-- Imagen principal -->
-      <div class="relative aspect-square">
-        <img src="${publicacion.imagenUrl || 'https://picsum.photos/400/400?random=' + publicacion.id}" 
+      <!-- Imagen principal - aspect ratio 1:1 (cuadrada) -->
+      <div class="relative aspect-square bg-gray-100 dark:bg-gray-800">
+        <img src="${publicacion.imagenUrl || 'https://picsum.photos/600/600?random=' + publicacion.id}" 
              alt="${publicacion.titulo}" 
-             class="w-full h-full object-cover">
+             class="w-full h-full object-cover"
+             loading="lazy">
       </div>
       
       <!-- Contenido -->
-      <div class="p-3">
+      <div class="p-4">
         <!-- Título y descripción -->
         <div>
-          <h3 class="font-semibold text-gray-900 dark:text-text-dark mb-1">
+          <h3 class="font-semibold text-gray-900 dark:text-text-dark mb-2 line-clamp-2">
             ${publicacion.titulo}
           </h3>
-          <p class="text-gray-600 dark:text-text-dark-secondary text-sm leading-relaxed">
-            ${(publicacion.descripcion || 'Esta es una publicación importante.').substring(0, 100)}${(publicacion.descripcion || '').length > 100 ? '...' : ''}
+          <p class="text-gray-600 dark:text-text-dark-secondary text-sm leading-relaxed line-clamp-3">
+            ${publicacion.descripcion || 'Esta es una publicación importante.'}
           </p>
         </div>
       </div>
     `;
 
-    // Append mobile card
-    grid.appendChild(mobileCard);
+
+    // Agregar la tarjeta al grid
+    grid.appendChild(instagramCard);
   });
-
-  // Crear un contenedor grid separado para desktop
-  const desktopGrid = document.createElement('div');
-  desktopGrid.className = "hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(200px,auto)]";
-  
-  // Crear las tarjetas desktop y agregarlas al grid
-  publicacionesData.forEach((publicacion, index) => {
-    const desktopCard = document.createElement("article");
-    desktopCard.className = "group relative flex flex-col bg-white dark:bg-card-dark rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer";
-    desktopCard.tabIndex = 0;
-    desktopCard.setAttribute("role", "button");
-    desktopCard.setAttribute("aria-label", publicacion.titulo);
-
-    // Set grid positioning based on index for desktop
-    if (index === 0) {
-      desktopCard.classList.add("lg:col-span-2", "lg:row-span-2");
-    } else if (index === 1) {
-      desktopCard.classList.add("lg:col-span-1", "lg:row-span-1");
-    } else if (index === 2) {
-      desktopCard.classList.add("lg:col-span-1", "lg:row-span-2");
-    } else if (index === 3) {
-      desktopCard.classList.add("lg:col-span-1", "lg:row-span-2");
-    } else {
-      desktopCard.classList.add("sm:col-span-1");
-    }
-
-    // Handle image or placeholder
-    let imageSection = "";
-    if (publicacion.imagenUrl && publicacion.imagenUrl.trim() !== "") {
-      imageSection = `
-        <div class="w-full h-full">
-          <img 
-            src="${publicacion.imagenUrl}" 
-            alt="${publicacion.titulo}" 
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          >
-        </div>`;
-    } else {
-      const colors = ["from-blue-500 to-blue-600", "from-green-500 to-green-600", 
-                     "from-purple-500 to-purple-600", "from-pink-500 to-pink-600"];
-      imageSection = `
-        <div class="w-full h-full bg-gradient-to-br ${colors[index % colors.length]} 
-                    flex items-center justify-center">
-          <i class="fa-solid fa-image text-4xl text-white opacity-80"></i>
-        </div>`;
-    }
-
-    // Content section with gradient overlay
-    const contentSection = `
-      <div class="absolute inset-0 flex flex-col justify-end p-4 z-10">
-        <div class="relative z-10">
-          <span class="text-xs ${index === 0 ? 'text-white/80' : 'text-gray-500 dark:text-text-dark-secondary'}">
-            ${formatDate(publicacion.fechaPublicacion)}
-          </span>
-          <h3 class="${index === 0 ? 'text-xl md:text-2xl' : 'text-base'} font-bold text-white line-clamp-2 mt-1">
-            ${publicacion.titulo}
-          </h3>
-          ${index === 0 ? `<p class="text-sm text-white/90 mt-2 line-clamp-2">${publicacion.descripcion || ''}</p>` : ''}
-        </div>
-        <!-- Gradient overlay for better text readability -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
-      </div>
-    `;
-
-    // Combine all sections for desktop
-    desktopCard.innerHTML = `
-      <div class="relative h-full">
-        ${imageSection}
-        ${contentSection}
-      </div>
-    `;
-
-    // Add click and keyboard interaction to desktop card
-    desktopCard.addEventListener("click", () => {
-      window.mostrarDetallePublicacion(publicacion);
-    });
-
-    desktopCard.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        window.mostrarDetallePublicacion(publicacion);
-      }
-    });
-
-    desktopGrid.appendChild(desktopCard);
-  });
-  
-  grid.appendChild(desktopGrid);
 }
 
 // Función global para mostrar el detalle de una publicación
@@ -512,7 +479,7 @@ window.mostrarDetallePublicacion = function(publicacion) {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Imagen -->
           <div class="relative">
-            <img src="${publicacion.imagenUrl || 'https://picsum.photos/600/400?random=' + publicacion.id}" 
+            <img src="${publicacion.imagenCabecera || publicacion.imagenUrl || 'https://picsum.photos/600/400?random=' + publicacion.id}" 
                  alt="${publicacion.titulo}" 
                  class="w-full h-96 object-cover rounded-lg shadow-lg">
           </div>
@@ -555,7 +522,7 @@ window.mostrarDetallePublicacion = function(publicacion) {
       <div class="bg-white dark:bg-card-dark">
         <!-- Imagen -->
         <div class="relative">
-          <img src="${publicacion.imagenUrl || 'https://picsum.photos/400/400?random=' + publicacion.id}" 
+          <img src="${publicacion.imagenCabecera || publicacion.imagenUrl || 'https://picsum.photos/400/400?random=' + publicacion.id}" 
                alt="${publicacion.titulo}" 
                class="w-full aspect-square object-cover">
         </div>
@@ -652,10 +619,16 @@ function switchTab(targetTabId) {
 
   // Special handling for Inicio tab
   if (targetTabId === "inicioContent") {
-    console.log("[v0] Special handling for inicioContent - calling renderPublicaciones")
-    setTimeout(() => {
-      renderPublicaciones()
-    }, 100)
+    console.log("[v0] Special handling for inicioContent - checking if publicaciones need loading")
+    if (publicacionesData.length === 0) {
+      console.log("[v0] No publications data, loading from API")
+      cargarPublicaciones()
+    } else {
+      console.log("[v0] Publications already loaded, rendering existing data")
+      setTimeout(() => {
+        renderPublicaciones()
+      }, 100)
+    }
   }
 }
 
@@ -663,8 +636,8 @@ function switchTab(targetTabId) {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[v0] DOMContentLoaded - Initializing dashboard with Inicio tab");
   
-  // Render publications when the page loads
-  renderPublicaciones();
+  // Cargar publicaciones dinámicamente desde la API
+  cargarPublicaciones();
 
   // Eliminar showEmptyState() al inicio
   // showEmptyState();
@@ -688,12 +661,6 @@ document.addEventListener("DOMContentLoaded", () => {
       switchTab(targetTab)
     })
   })
-
-  console.log("[v0] Setting up additional timeout for renderPublicaciones")
-  setTimeout(() => {
-    console.log("[v0] Timeout reached - calling renderPublicaciones again")
-    renderPublicaciones()
-  }, 200)
 })
 
 // Lucide icon creation

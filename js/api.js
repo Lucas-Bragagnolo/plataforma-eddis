@@ -207,6 +207,17 @@ class ApiService {
     return localStorage.getItem("selectedCountry") || "argentina"
   }
 
+  // Get novedades/publicaciones data
+  async getNovedadesData() {
+    const country = localStorage.getItem("selectedCountry");
+    const token = this.getAuthToken();
+    const params = new URLSearchParams({ pais: country, token }).toString();
+    console.log("[API DEBUG] Enviando a /novedades/datos.php con GET:", params);
+    return await this.makeRequest(`/novedades/datos.php?${params}`, {
+      method: "GET"
+    });
+  }
+
   // Logout method
   logout() {
     this.removeAuthToken()
